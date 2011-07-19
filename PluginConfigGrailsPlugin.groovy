@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+//import org.grails.plugin.config.DefaultConfigArtefactHandler
+ import org.grails.plugin.config.DefaultConfigHelper
+ 
 class PluginConfigGrailsPlugin {
     // the plugin version
     def version = "0.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2.0 > *"
     // the other plugins this plugin depends on
-    def dependsOn = [:]
+    def dependsOn = ['core': '* > 1.0']
+    
+    def loadBefore = ['logging']
+    def loadAfter = ['core']
+    
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
             "grails-app/views/error.gsp",
@@ -37,21 +43,43 @@ Brief description of the plugin.
 
     // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/plugin-config"
+    
+    // register the artefact handler
+    //def artefacts = [DefaultConfigArtefactHandler]
+     
+    // watch for any changes in these directories
+    def watchedResources = [
+        "file:./grails-app/config/**/*DefaultConfig.groovy",
+        "file:../../plugins/**/grails-app/config/**/*DefaultConfig.groovy"
+    ]
 
     def doWithWebDescriptor = { xml ->
-        // TODO Implement additions to web.xml (optional), this event occurs before 
+        // TODO Implement additions to web.xml (optional), this event occurs before
+        //println "${this.class}.doWithWebDescriptor()"
     }
 
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
+        //println "${this.class}.doWithSpring()"
+        defaultConfigHelper(DefaultConfigHelper) {
+            pluginManager = ref('pluginManager', true)
+            grailsApplication = ref('grailsApplication', true)
+        }
+        
+        DefaultConfigHelper d = new DefaultConfigHelper()
+        d.grailsApplication = application
+        d.pluginManager = application.parentContext.getBean('pluginManager')
+        d.afterPropertiesSet()
     }
 
     def doWithDynamicMethods = { ctx ->
         // TODO Implement registering dynamic methods to classes (optional)
+        //println "${this.class}.doWithDynamicMethod()"
     }
 
     def doWithApplicationContext = { applicationContext ->
         // TODO Implement post initialization spring config (optional)
+        //println "${this.class}.doWithApplicationContext()"
     }
 
     def onChange = { event ->
