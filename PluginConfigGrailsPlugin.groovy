@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 //import org.grails.plugin.config.DefaultConfigArtefactHandler
- import org.grails.plugin.config.DefaultConfigHelper
- 
+import org.codehaus.groovy.grails.commons.GrailsApplication;
+import org.grails.plugin.config.DefaultConfigHelper;
+//import org.grails.plugin.config.PluginConfigArtefactHandler;
+
 class PluginConfigGrailsPlugin {
     // the plugin version
     def version = "0.1"
@@ -23,14 +25,14 @@ class PluginConfigGrailsPlugin {
     def grailsVersion = "1.2.0 > *"
     // the other plugins this plugin depends on
     def dependsOn = ['core': '* > 1.0']
-    
+
     def loadBefore = ['logging']
     def loadAfter = ['core']
-    
+
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-            "grails-app/views/error.gsp",
-            'scripts/**/Eclipse.groovy'
+        "grails-app/views/error.gsp",
+        'scripts/**/Eclipse.groovy'
     ]
 
     // TODO Fill in these fields
@@ -43,33 +45,32 @@ Brief description of the plugin.
 
     // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/plugin-config"
-    
+
     // register the artefact handler
-    //def artefacts = [DefaultConfigArtefactHandler]
-     
+    //def artefacts = [PluginConfigArtefactHandler]
+
     // watch for any changes in these directories
     def watchedResources = [
         "file:./grails-app/config/**/*DefaultConfig.groovy",
         "file:../../plugins/**/grails-app/config/**/*DefaultConfig.groovy"
     ]
+    
+    private DefaultConfigHelper configHelper = new DefaultConfigHelper()
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
         //println "${this.class}.doWithWebDescriptor()"
+        configHelper.enhanceGrailsApplication(manager, application)
     }
 
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
         //println "${this.class}.doWithSpring()"
         defaultConfigHelper(DefaultConfigHelper) {
-            pluginManager = ref('pluginManager', true)
-            grailsApplication = ref('grailsApplication', true)
+            pluginManager = ref('pluginManager')
+            grailsApplication = ref('grailsApplication')
         }
-        
-        DefaultConfigHelper d = new DefaultConfigHelper()
-        d.grailsApplication = application
-        d.pluginManager = application.parentContext.getBean('pluginManager')
-        d.afterPropertiesSet()
+        configHelper.enhanceGrailsApplication(manager, application)
     }
 
     def doWithDynamicMethods = { ctx ->

@@ -19,12 +19,13 @@ import org.codehaus.groovy.grails.plugins.GrailsPluginManager;
 import org.codehaus.groovy.grails.plugins.PluginManagerAware;
 import org.codehaus.groovy.grails.plugins.support.aware.GrailsApplicationAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 
 public abstract class AbstractDefaultConfigHelper implements
         PluginManagerAware, GrailsApplicationAware, InitializingBean {
 
-    private final Log log = LogFactory.getLog(getClass());
+    protected final Log log = LogFactory.getLog(getClass());
     private GrailsApplication grailsApplication;
     private GrailsPluginManager pluginManager;
 
@@ -52,14 +53,16 @@ public abstract class AbstractDefaultConfigHelper implements
         this.pluginManager = pluginManager;
     }
 
+    public ConfigObject getMergedConfig(GrailsApplication grailsApplication) {
+        GrailsPluginManager pluginManager = getPluginManager(grailsApplication);
+        return getMergedConfig(pluginManager, grailsApplication);
+    }
+
     public ConfigObject getMergedConfig(GrailsPluginManager pluginManager,
             GrailsApplication grailsApplication) {
+        enhanceGrailsApplication(pluginManager, grailsApplication);
+
         ConfigObject mergedConfig = (ConfigObject) Eval.x(grailsApplication,
-                "x.mergedConfig");
-        if (mergedConfig == null) {
-            enhanceGrailsApplication(pluginManager, grailsApplication);
-        }
-        mergedConfig = (ConfigObject) Eval.x(grailsApplication,
                 "x.mergedConfig");
         return mergedConfig;
     }
@@ -72,13 +75,18 @@ public abstract class AbstractDefaultConfigHelper implements
             GrailsPluginManager pluginManager,
             GrailsApplication grailsApplication);
 
+    protected void enhanceGrailsApplication(GrailsApplication grailsApplication) {
+        enhanceGrailsApplication(getPluginManager(grailsApplication),
+                grailsApplication);
+    }
+
     protected ConfigObject getMergedConfigImpl(
             GrailsPluginManager pluginManager,
             GrailsApplication grailsApplication) {
         if (log.isDebugEnabled()) {
             log.debug("getMergedConfigImpl()");
         }
-        
+
         Assert.notNull(pluginManager);
         Assert.notNull(grailsApplication);
 
@@ -103,9 +111,10 @@ public abstract class AbstractDefaultConfigHelper implements
                 defaultConfigClasses.add(defaultConfigClass);
             }
         }
-        
+
         if (log.isDebugEnabled()) {
-            log.debug("getMergedConfigImpl(): defaultConfigClasses " + defaultConfigClasses);
+            log.debug("getMergedConfigImpl(): defaultConfigClasses "
+                    + defaultConfigClasses);
         }
 
         GroovyClassLoader classLoader = null;
@@ -162,6 +171,14 @@ public abstract class AbstractDefaultConfigHelper implements
             ConfigObject newConfig = configSlurper.parse(defaultConfigClass);
             config.merge(newConfig);
         }
+    }
+
+    protected GrailsPluginManager getPluginManager(
+            GrailsApplication grailsApplication) {
+        ApplicationContext parentContext = grailsApplication.getParentContext();
+        GrailsPluginManager pluginManager = (GrailsPluginManager) parentContext
+                .getBean("pluginManager");
+        return pluginManager;
     }
 
 }

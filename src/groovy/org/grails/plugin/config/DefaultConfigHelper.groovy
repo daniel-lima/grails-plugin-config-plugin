@@ -7,8 +7,20 @@ class DefaultConfigHelper extends AbstractDefaultConfigHelper {
 
     @Override
     protected void enhanceGrailsApplication(GrailsPluginManager pluginManager,
-            GrailsApplication grailsApplication) {
-        grailsApplication.metaClass.getMergedConfig = super.buildGetMergedConfig(pluginManager, grailsApplication)
-    }
+    GrailsApplication grailsApplication) {
+        if (log.isDebugEnabled()) {
+            log.debug("Enhancing ${grailsApplication} ${pluginManager}")
+        }
+        MetaClass mc = grailsApplication.metaClass
+        if (!mc.respondsTo('getMergedConfig')) {
+            mc._mergedConfig = null
+            mc.getMergedConfig = {
+                if (delegate._mergedConfig == null) {
+                    delegate._mergedConfig = super.buildGetMergedConfig(pluginManager, grailsApplication)
+                }
 
+                return delegate._mergedConfig
+            }
+        }
+    }
 }
