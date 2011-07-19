@@ -156,9 +156,9 @@ public abstract class AbstractDefaultConfigHelper implements
             List<Class<?>> defaultConfigClasses, GroovyClassLoader classLoader) {
         ConfigSlurper configSlurper = new ConfigSlurper(Environment
                 .getCurrent().getName());
-        configSlurper.setBinding(config);
         configSlurper.setClassLoader(classLoader);
         for (Class<?> defaultConfigClass : defaultConfigClasses) {
+            configSlurper.setBinding(config);
             ConfigObject newConfig = configSlurper.parse(defaultConfigClass);
             config.merge(newConfig);
         }
