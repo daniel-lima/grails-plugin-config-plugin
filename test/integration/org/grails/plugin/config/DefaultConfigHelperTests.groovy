@@ -17,5 +17,16 @@ class DefaultConfigHelperTests extends GroovyTestCase {
         assertNotNull mergedConfig
         assertNotSame mergedConfig, grailsApplication.config
         assertSame mergedConfig, configHelper.mergedConfig
+        assertSame mergedConfig, configHelper.mergedConfig
+        mergedConfig = grailsApplication.mergedConfig
+        assertNotNull mergedConfig
+        assertSame mergedConfig, grailsApplication.mergedConfig
+        assertSame mergedConfig, grailsApplication.mergedConfig
+    }
+    
+    void testMergedConfig() {
+        ConfigObject mergedConfig = grailsApplication.mergedConfig
+        assertEquals 123, mergedConfig.grails.plugins.logging.logVal1
+        assertEquals 'abc', mergedConfig.grails.plugins.logging.logVal2
     }
 }

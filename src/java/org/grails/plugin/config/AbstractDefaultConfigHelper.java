@@ -17,7 +17,6 @@ package org.grails.plugin.config;
 
 import grails.util.Environment;
 import grails.util.GrailsNameUtils;
-import groovy.lang.Closure;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 import groovy.lang.MetaClass;
@@ -103,7 +102,7 @@ public abstract class AbstractDefaultConfigHelper implements
 
     @Override
     public ConfigObject getMergedConfig() {
-        return getMergedConfigImpl(this.pluginManager, this.grailsApplication);
+        return getMergedConfig(this.pluginManager, this.grailsApplication);
     }
 
     public abstract void enhanceGrailsApplication(
@@ -117,7 +116,7 @@ public abstract class AbstractDefaultConfigHelper implements
 
     public abstract void notifyConfigChange(GrailsApplication grailsApplication);
 
-    protected ConfigObject getMergedConfigImpl(
+    protected ConfigObject buildMergedConfig(
             GrailsPluginManager pluginManager,
             GrailsApplication grailsApplication) {
         if (log.isDebugEnabled()) {
@@ -226,21 +225,7 @@ public abstract class AbstractDefaultConfigHelper implements
         return config;
     }
 
-    @SuppressWarnings("serial")
-    protected Closure buildGetMergedConfig(
-            final GrailsPluginManager pluginManager,
-            final GrailsApplication grailsApplication) {
-        return new Closure(this) {
-
-            @SuppressWarnings("unused")
-            public ConfigObject doCall() {
-                return AbstractDefaultConfigHelper.this.getMergedConfigImpl(
-                        pluginManager, grailsApplication);
-            }
-
-        };
-
-    }
+  
 
     protected void mergeInDefaultConfigs(ConfigObject config,
             List<Class<?>> defaultConfigClasses, GroovyClassLoader classLoader) {
