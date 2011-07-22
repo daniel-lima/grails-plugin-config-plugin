@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.GrailsApplication 
 import org.grails.plugin.config.DefaultConfigHelper
 
 class PluginConfigGrailsPlugin {
@@ -64,9 +64,8 @@ Brief description of the plugin.
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
         //println "${this.class}.doWithSpring()"
-        defaultConfigHelper(DefaultConfigHelper) {
-            pluginManager = ref('pluginManager')
-            grailsApplication = ref('grailsApplication')
+        configHelper(DefaultConfigHelper) {bean ->
+            bean.autowire = 'byName'
         }
         configHelper.enhanceGrailsApplication(manager, application)
     }
@@ -85,10 +84,14 @@ Brief description of the plugin.
         // TODO Implement code that is executed when any artefact that this plugin is
         // watching is modified and reloaded. The event contains: event.source,
         // event.application, event.manager, event.ctx, and event.plugin.
+        event.ctx.grailsApplication.configHelper.notifyConfigChange(event.application)
+        if (application != event.application) {configHelper.notifyConfigChange(application)}
     }
 
     def onConfigChange = { event ->
         // TODO Implement code that is executed when the project configuration changes.
         // The event is the same as for 'onChange'.
+        event.ctx.grailsApplication.configHelper.notifyConfigChange(event.application)
+        if (application != event.application) {configHelper.notifyConfigChange(application)}
     }
 }

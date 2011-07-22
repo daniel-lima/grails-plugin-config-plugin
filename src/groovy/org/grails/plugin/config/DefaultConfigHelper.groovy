@@ -17,6 +17,7 @@ package org.grails.plugin.config
 
 import org.codehaus.groovy.grails.commons.GrailsApplication;
 import org.codehaus.groovy.grails.plugins.GrailsPluginManager;
+import org.springframework.util.Assert;
 
 /**
  * 
@@ -26,21 +27,44 @@ import org.codehaus.groovy.grails.plugins.GrailsPluginManager;
 class DefaultConfigHelper extends AbstractDefaultConfigHelper {
 
     @Override
-    protected void enhanceGrailsApplication(GrailsPluginManager pluginManager,
+    public void enhanceGrailsApplication(GrailsPluginManager pluginManager,
     GrailsApplication grailsApplication) {
         if (log.isDebugEnabled()) {
             log.debug("Enhancing ${grailsApplication} ${pluginManager}")
         }
         MetaClass mc = grailsApplication.metaClass
-        if (!mc.respondsTo('getMergedConfig')) {
+        if (!mc.respondsTo(grailsApplication, 'getMergedConfig')) {
+            log.debug('Adding getMergedConfig()')
+            
             mc._mergedConfig = null
             mc.getMergedConfig = {
+                
+                /*
+                log.debug("delegate ${delegate}")
+                log.debug("delegate._mergedConfig ${delegate._mergedConfig}")
                 if (delegate._mergedConfig == null) {
                     delegate._mergedConfig = super.buildGetMergedConfig(pluginManager, grailsApplication)
                 }
 
-                return delegate._mergedConfig
+                return delegate._mergedConfig*/
+                
+                throw new RuntimeException("" + delegate)
             }
+        }
+        
+        assert mc.respondsTo(grailsApplication, 'getMergedConfig')
+    }
+
+    @Override
+    public void notifyConfigChange(GrailsApplication grailsApplication) {
+        if (log.isDebugEnabled()) {
+            log.debug("Notifying config change ${grailsApplication}")
+        }
+        MetaClass mc = grailsApplication.metaClass
+        if (mc.respondsTo(grailsApplication, 'getMergedConfig')) {
+            mc._mergedConfig = null
+        } else {
+            super.enhanceGrailsApplication grailsApplication
         }
     }
 }
