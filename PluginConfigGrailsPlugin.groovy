@@ -55,6 +55,8 @@ Brief description of the plugin.
     ]
     
     private DefaultConfigHelper configHelper = new DefaultConfigHelper()
+    
+    def defaultConfig = PluginConfigDefaultConfig
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
