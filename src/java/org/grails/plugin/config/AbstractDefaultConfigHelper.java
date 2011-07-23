@@ -16,21 +16,13 @@
 package org.grails.plugin.config;
 
 import grails.util.Environment;
-
-import grails.util.GrailsNameUtils;
 import groovy.lang.GroovyClassLoader;
-import groovy.lang.GroovyObject;
-import groovy.lang.MetaClass;
-import groovy.lang.MetaProperty;
 import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
 import groovy.util.Eval;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,11 +32,9 @@ import org.codehaus.groovy.grails.plugins.GrailsPlugin;
 import org.codehaus.groovy.grails.plugins.GrailsPluginManager;
 import org.codehaus.groovy.grails.plugins.PluginManagerAware;
 import org.codehaus.groovy.grails.plugins.support.aware.GrailsApplicationAware;
-import org.codehaus.groovy.runtime.InvokerHelper;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
-
 
 /**
  * 
@@ -118,8 +108,7 @@ public abstract class AbstractDefaultConfigHelper implements
 
     public abstract void notifyConfigChange(GrailsApplication grailsApplication);
 
-    protected ConfigObject buildMergedConfig(
-            GrailsPluginManager pluginManager,
+    protected ConfigObject buildMergedConfig(GrailsPluginManager pluginManager,
             GrailsApplication grailsApplication) {
         if (log.isDebugEnabled()) {
             log.debug("getMergedConfigImpl()");
@@ -128,17 +117,7 @@ public abstract class AbstractDefaultConfigHelper implements
         Assert.notNull(pluginManager);
         Assert.notNull(grailsApplication);
 
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> myConfig = new LinkedHashMap<String, Object>(
-                (Map<String, Object>) Eval.x(grailsApplication,
-                        "x.config.grails.plugins.config"));
-        final boolean autoDefaultEnabled = myConfig.get("autoEnabled") == null
-                || "true".equals(myConfig.get("autoEnabled").toString());
-
         List<Class<?>> defaultConfigClasses = new ArrayList<Class<?>>();
-
-        final String defaultConfigPropertyName = GrailsNameUtils
-                .getPropertyName(DEFAULT_CONFIG_SUFFIX);
 
         /* Use plugin processing order. */
         for (GrailsPlugin plugin : pluginManager.getAllPlugins()) {
@@ -146,59 +125,56 @@ public abstract class AbstractDefaultConfigHelper implements
                 Class<?> defaultConfigClass = null;
 
                 Class<?> pluginClass = plugin.getPluginClass();
-                GroovyObject pluginInstance = plugin.getInstance();
-                MetaClass pluginMetaClass = InvokerHelper
-                        .getMetaClass(pluginClass);
-                Object defaultConfigObj = null;
+                org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin pluginClassMetadata = null;
+                org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin defaultConfigClassMetadata = null;
 
-                MetaProperty prop = pluginMetaClass.hasProperty(pluginInstance,
-                        defaultConfigPropertyName);
-                if (prop != null) {
-                    if ((prop.getModifiers() & Modifier.STATIC) != Modifier.STATIC) {
-                        defaultConfigObj = prop.getProperty(pluginInstance);
-                    } else {
-                        defaultConfigObj = prop.getProperty(null);
-                    }
+                String configName = pluginClass.getSimpleName();
+                if (configName.endsWith(GRAILS_PLUGIN_SUFFIX)) {
+                    configName = configName.replace(GRAILS_PLUGIN_SUFFIX,
+                            DEFAULT_CONFIG_SUFFIX);
+                } else {
+                    configName = configName + DEFAULT_CONFIG_SUFFIX;
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("getMergedConfigImpl(): configName " + configName);
                 }
 
-                if (defaultConfigObj != null) {
-                    if (defaultConfigObj instanceof Class) {
-                        defaultConfigClass = (Class<?>) defaultConfigObj;
-                    } else {
-                        log.error("getMergedConfigImpl(): "
-                                + pluginClass.getName() + "."
-                                + defaultConfigPropertyName + " returned "
-                                + defaultConfigObj.getClass());
-                        continue;
-                    }
-                } else if (autoDefaultEnabled) {
-                    String configName = pluginClass.getSimpleName();
-                    if (configName.endsWith(GRAILS_PLUGIN_SUFFIX)) {
-                        configName = configName.replace(GRAILS_PLUGIN_SUFFIX,
-                                DEFAULT_CONFIG_SUFFIX);
-                    } else {
-                        configName = configName + DEFAULT_CONFIG_SUFFIX;
-                    }
+                defaultConfigClass = grailsApplication
+                        .getClassForName(configName);
+
+                if (defaultConfigClass != null) {
+                    /* The class is inside one grails-app subdirectory. */
+
+                    pluginClassMetadata = pluginClass
+                            .getAnnotation(org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin.class);
+
+                    defaultConfigClassMetadata = defaultConfigClass
+                            .getAnnotation(org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin.class);
+
                     if (log.isDebugEnabled()) {
-                        log.debug("getMergedConfigImpl(): configName "
-                                + configName);
+                        log.debug("getMergedConfigImpl(): pluginClassMetadata "
+                                + pluginClassMetadata);
+                        log.debug("getMergedConfigImpl(): defaultConfigClassMetadata "
+                                + defaultConfigClassMetadata);
                     }
 
-                    defaultConfigClass = grailsApplication
-                            .getClassForName(configName);
-                    org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin ann = null;
-                    
-                    if (defaultConfigClass != null) {
-                        ann = defaultConfigClass.getAnnotation(org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin.class);
-                        
-                        if (ann != null) {
-                            log.debug("getMergedConfigImpl(): " + pluginClass.getAnnotation(org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin.class));
+                    if (pluginClassMetadata == null
+                            && defaultConfigClassMetadata == null
+                            || pluginClassMetadata != null
+                            && defaultConfigClassMetadata != null
+                            && pluginClassMetadata.name().equals(
+                                    defaultConfigClassMetadata.name())) {
+                        /* The default config belongs to this plugin. */
+                        log.debug("getMergedConfigImpl(): default config found");
+                    } else {
+                        if (log.isWarnEnabled()) {
+                            log.warn("getMergedConfigImpl(): "
+                                    + defaultConfigClass
+                                    + " doesn't belong to " + plugin.getName());
                         }
+                        defaultConfigClass = null;
                     }
-                    
-                    if (log.isDebugEnabled()) {
-                        log.debug("getMergedConfigImpl(): ann.name() " + (ann != null? ann.name() : null));
-                    }
+
                 }
 
                 if (defaultConfigClass != null) {
@@ -239,8 +215,6 @@ public abstract class AbstractDefaultConfigHelper implements
 
         return config;
     }
-
-  
 
     protected void mergeInDefaultConfigs(ConfigObject config,
             List<Class<?>> defaultConfigClasses, GroovyClassLoader classLoader) {
