@@ -37,9 +37,9 @@ class PluginConfigGrailsPlugin {
     // TODO Fill in these fields
     def author = "Daniel Henrique Alves Lima"
     def authorEmail = "email_daniel_h@yahoo.com.br"
-    def title = "Plugin to simplify configuration related tasks"
+    def title = "Plugin to simplify plugin configuration tasks"
     def description = '''\\
-Plugin to simplify configuration related tasks.
+Plugin to simplify plugin configuration tasks.
 '''
 
     // URL to the plugin's documentation
@@ -87,14 +87,14 @@ Plugin to simplify configuration related tasks.
         // TODO Implement code that is executed when any artefact that this plugin is
         // watching is modified and reloaded. The event contains: event.source,
         // event.application, event.manager, event.ctx, and event.plugin.
-        event.ctx."${DefaultConfigHelper.class.name}".notifyConfigChange(event.application)
+        event.ctx.getBean("${DefaultConfigHelper.class.name}").notifyConfigChange(event.application)
         if (application != event.application) {configHelper.notifyConfigChange(application)}
     }
 
     def onConfigChange = { event ->
         // TODO Implement code that is executed when the project configuration changes.
         // The event is the same as for 'onChange'.
-        event.ctx."${DefaultConfigHelper.class.name}".notifyConfigChange(event.application)
+        event.ctx.getBean("${DefaultConfigHelper.class.name}").notifyConfigChange(event.application)
         if (application != event.application) {configHelper.notifyConfigChange(application)}
     }
 }
