@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.grails.plugin.config.DefaultConfigArtefactHandler
 import org.grails.plugin.config.DefaultConfigHelper
 
 class PluginConfigGrailsPlugin {
@@ -31,15 +30,16 @@ class PluginConfigGrailsPlugin {
     def pluginExcludes = [
         "grails-app/views/error.gsp",
         'scripts/**/Eclipse.groovy',
-        'grails-app/conf/**/LoggingDefaultConfig.groovy'
+        'grails-app/conf/**/FiltersDefaultConfig.groovy',
+        'test-plugins/**/*'
     ]
 
     // TODO Fill in these fields
     def author = "Daniel Henrique Alves Lima"
     def authorEmail = "email_daniel_h@yahoo.com.br"
-    def title = "Plugin summary/headline"
+    def title = "Plugin to simplify configuration related tasks"
     def description = '''\\
-Brief description of the plugin.
+Plugin to simplify configuration related tasks.
 '''
 
     // URL to the plugin's documentation
@@ -67,7 +67,7 @@ Brief description of the plugin.
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
         //println "${this.class}.doWithSpring()"
-        configHelper(DefaultConfigHelper) {bean ->
+        "${DefaultConfigHelper.class.name}"(DefaultConfigHelper) {bean ->
             bean.autowire = 'byName'
         }
         configHelper.enhanceGrailsApplication(manager, application)
@@ -87,14 +87,14 @@ Brief description of the plugin.
         // TODO Implement code that is executed when any artefact that this plugin is
         // watching is modified and reloaded. The event contains: event.source,
         // event.application, event.manager, event.ctx, and event.plugin.
-        event.ctx.grailsApplication.configHelper.notifyConfigChange(event.application)
+        event.ctx."${DefaultConfigHelper.class.name}".notifyConfigChange(event.application)
         if (application != event.application) {configHelper.notifyConfigChange(application)}
     }
 
     def onConfigChange = { event ->
         // TODO Implement code that is executed when the project configuration changes.
         // The event is the same as for 'onChange'.
-        event.ctx.grailsApplication.configHelper.notifyConfigChange(event.application)
+        event.ctx."${DefaultConfigHelper.class.name}".notifyConfigChange(event.application)
         if (application != event.application) {configHelper.notifyConfigChange(application)}
     }
 }

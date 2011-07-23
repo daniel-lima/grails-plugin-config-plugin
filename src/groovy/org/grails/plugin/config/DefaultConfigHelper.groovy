@@ -40,8 +40,8 @@ class DefaultConfigHelper extends AbstractDefaultConfigHelper {
             mc.getMergedConfig = {boolean reload = false ->
                 
                 
-                //log.debug("delegate ${delegate}")
-                //log.debug("delegate._mergedConfig ${delegate._mergedConfig}")
+                log.debug("delegate ${delegate}")
+                log.debug("delegate._mergedConfig ${delegate._mergedConfig?'[...]': 'null'}")
                 if (delegate._mergedConfig == null || reload) {
                     delegate._mergedConfig = super.buildMergedConfig(
                         pluginManager, grailsApplication);
@@ -61,7 +61,8 @@ class DefaultConfigHelper extends AbstractDefaultConfigHelper {
         }
         MetaClass mc = grailsApplication.metaClass
         if (mc.respondsTo(grailsApplication, 'getMergedConfig')) {
-            mc._mergedConfig = null
+            log.debug("Clearing _mergedConfig")
+            grailsApplication._mergedConfig = null
         } else {
             super.enhanceGrailsApplication grailsApplication
         }

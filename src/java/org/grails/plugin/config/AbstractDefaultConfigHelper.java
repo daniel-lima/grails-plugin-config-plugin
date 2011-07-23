@@ -16,7 +16,9 @@
 package org.grails.plugin.config;
 
 import grails.util.Environment;
+import groovy.lang.Closure;
 import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovyObject;
 import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
 import groovy.util.Eval;
@@ -27,6 +29,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.groovy.grails.commons.GrailsApplication;
+import org.codehaus.groovy.grails.commons.GrailsClassUtils;
 import org.codehaus.groovy.grails.commons.cfg.ConfigurationHelper;
 import org.codehaus.groovy.grails.plugins.GrailsPlugin;
 import org.codehaus.groovy.grails.plugins.GrailsPluginManager;
@@ -42,8 +45,7 @@ import org.springframework.util.Assert;
  * 
  */
 public abstract class AbstractDefaultConfigHelper implements
-        PluginManagerAware, GrailsApplicationAware, InitializingBean,
-        ConfigHelper {
+        PluginManagerAware, GrailsApplicationAware, InitializingBean  {
 
     private static final String GRAILS_PLUGIN_SUFFIX = "GrailsPlugin";
     private static final String DEFAULT_CONFIG_SUFFIX = "DefaultConfig";
@@ -76,13 +78,13 @@ public abstract class AbstractDefaultConfigHelper implements
         this.pluginManager = pluginManager;
     }
 
-    @Override
+    //@Override
     public ConfigObject getMergedConfig(GrailsApplication grailsApplication) {
         GrailsPluginManager pluginManager = getPluginManager(grailsApplication);
         return getMergedConfig(pluginManager, grailsApplication);
     }
 
-    @Override
+    //@Override
     public ConfigObject getMergedConfig(GrailsPluginManager pluginManager,
             GrailsApplication grailsApplication) {
         enhanceGrailsApplication(pluginManager, grailsApplication);
@@ -92,7 +94,7 @@ public abstract class AbstractDefaultConfigHelper implements
         return mergedConfig;
     }
 
-    @Override
+    //@Override
     public ConfigObject getMergedConfig() {
         return getMergedConfig(this.pluginManager, this.grailsApplication);
     }
@@ -119,7 +121,8 @@ public abstract class AbstractDefaultConfigHelper implements
 
         List<Class<?>> defaultConfigClasses = new ArrayList<Class<?>>();
 
-        /* Use plugin processing order. */
+        /* Search for all the default configurations using the plugin manager processing order. */
+        List<Closure> afterConfigMergeClosures = new ArrayList<Closure>(); 
         for (GrailsPlugin plugin : pluginManager.getAllPlugins()) {
             if (plugin.isEnabled()) {
                 Class<?> defaultConfigClass = null;
@@ -180,6 +183,28 @@ public abstract class AbstractDefaultConfigHelper implements
                 if (defaultConfigClass != null) {
                     defaultConfigClasses.add(defaultConfigClass);
                 }
+                
+                
+                GroovyObject pluginInstance = plugin.getInstance();
+                Object o = GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(pluginInstance, "afterConfigMerge");
+                if (o != null) {
+                    Closure c = null;
+                    if (o instanceof Closure) {
+                        c = (Closure) o;
+                        if (c.getMaximumNumberOfParameters() == 1) {
+                            afterConfigMergeClosures.add(c);
+                        } else {
+                            c = null;
+                        }
+                    }
+                    
+                    if (c == null) {
+                        if (log.isWarnEnabled()) {
+                            log.warn("getMergedConfigImpl(): Invalid afterConfigMerge closure "
+                                    + o);
+                        }
+                    }
+                }
             }
         }
 
@@ -212,6 +237,20 @@ public abstract class AbstractDefaultConfigHelper implements
 
         ConfigurationHelper.initConfig(config, null, classLoader);
         config.merge(grailsApplication.getConfig());
+        if (log.isDebugEnabled()) {
+            log.debug("getMergedConfigImpl(): config " + config);
+        }
+        
+        /* Executed the collected closures. It's the last chance of influencing the merged config. */
+        for (Closure closure : afterConfigMergeClosures) {
+            try {
+                closure.call(config);
+            } catch (Exception e) {
+                log.error(
+                        "getMergedConfigImpl(): error executing afterConfigClosure",
+                        e);
+            }
+        }
 
         return config;
     }
@@ -224,7 +263,14 @@ public abstract class AbstractDefaultConfigHelper implements
         for (Class<?> defaultConfigClass : defaultConfigClasses) {
             configSlurper.setBinding(config);
             ConfigObject newConfig = configSlurper.parse(defaultConfigClass);
+            if (log.isDebugEnabled()) {
+                log.debug("mergeInDefaultConfigs(): newConfig " + newConfig);
+            }
             config.merge(newConfig);
+        }
+        
+        if (log.isDebugEnabled()) {
+            log.debug("mergeInDefaultConfigs(): config " + config);
         }
     }
 
