@@ -29,3 +29,7 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.13'
     }
 }
+
+if (appName == "plugin-config") {
+    grails.plugin.location.'pb' = "/tmp/pb"
+}

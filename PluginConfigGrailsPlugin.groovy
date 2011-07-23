@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.codehaus.groovy.grails.commons.GrailsApplication 
+import org.grails.plugin.config.DefaultConfigArtefactHandler
 import org.grails.plugin.config.DefaultConfigHelper
 
 class PluginConfigGrailsPlugin {
@@ -46,7 +46,7 @@ Brief description of the plugin.
     def documentation = "http://grails.org/plugin/plugin-config"
 
     // register the artefact handler
-    //def artefacts = [PluginConfigArtefactHandler]
+    //def artefacts = [DefaultConfigArtefactHandler]
 
     // watch for any changes in these directories
     def watchedResources = [
@@ -56,7 +56,7 @@ Brief description of the plugin.
     
     private DefaultConfigHelper configHelper = new DefaultConfigHelper()
     
-    def defaultConfig = PluginConfigDefaultConfig
+    //def defaultConfig = PluginConfigDefaultConfig
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before

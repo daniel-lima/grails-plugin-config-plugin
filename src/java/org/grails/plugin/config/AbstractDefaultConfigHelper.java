@@ -16,6 +16,7 @@
 package org.grails.plugin.config;
 
 import grails.util.Environment;
+
 import grails.util.GrailsNameUtils;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
@@ -43,6 +44,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
+
 
 /**
  * 
@@ -184,6 +186,19 @@ public abstract class AbstractDefaultConfigHelper implements
 
                     defaultConfigClass = grailsApplication
                             .getClassForName(configName);
+                    org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin ann = null;
+                    
+                    if (defaultConfigClass != null) {
+                        ann = defaultConfigClass.getAnnotation(org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin.class);
+                        
+                        if (ann != null) {
+                            log.debug("getMergedConfigImpl(): " + pluginClass.getAnnotation(org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin.class));
+                        }
+                    }
+                    
+                    if (log.isDebugEnabled()) {
+                        log.debug("getMergedConfigImpl(): ann.name() " + (ann != null? ann.name() : null));
+                    }
                 }
 
                 if (defaultConfigClass != null) {

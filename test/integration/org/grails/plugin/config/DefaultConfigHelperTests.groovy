@@ -12,6 +12,13 @@ class DefaultConfigHelperTests extends GroovyTestCase {
         assertTrue configHelper instanceof DefaultConfigHelper
     }
     
+    void testNewArtefacts() {
+        def artefacts = grailsApplication.getArtefacts(DefaultConfigArtefactHandler.TYPE);
+        assertNotNull artefacts
+        assertTrue artefacts.length > 0
+        println artefacts
+    }
+    
     void testMergedConfigInstance() {
         ConfigObject mergedConfig = configHelper.mergedConfig
         assertNotNull mergedConfig
