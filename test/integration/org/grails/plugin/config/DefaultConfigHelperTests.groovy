@@ -3,6 +3,7 @@ package org.grails.plugin.config
 import org.codehaus.groovy.grails.commons.ConfigurationHolder;
 
 import grails.test.*
+import grails.util.Environment;
 
 class DefaultConfigHelperTests extends GroovyTestCase {
 
@@ -61,14 +62,20 @@ class DefaultConfigHelperTests extends GroovyTestCase {
     void testPluginMergedConfig() {
         
         ConfigObject mergedConfig = grailsApplication.mergedConfig
+        ConfigObject thirdConfig = new ConfigSlurper().parse(grailsApplication.mainContext.classLoader.loadClass('ThirdPluginDefaultConfig'))
+        println "thirdConfig ${thirdConfig}"
         
         assertEquals true, mergedConfig.grails.plugins.first.value1
         assertEquals 'plugin1', mergedConfig.grails.plugins.first.value2
         
         assertEquals 'Plugin3', mergedConfig.grails.plugins.third.value1
+        assertEquals thirdConfig.grails.plugins.third.value1, mergedConfig.grails.plugins.third.value1
         
         assertEquals 'abc', mergedConfig.grails.plugins.second.value1
         assertEquals 'Plugin3-2', mergedConfig.grails.plugins.second.value2
+        
+        assertEquals 'plugin3 has some value here', thirdConfig.grails.plugins.third.valueToOverride
+        assertEquals 'app has a different value', mergedConfig.grails.plugins.third.valueToOverride
         
     }
     

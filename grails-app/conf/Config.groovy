@@ -24,3 +24,6 @@ log4j = {
     
     debug  'org.grails.plugin.config'
 }
+
+grails.plugins.third.valueToOverride = 'app has a different value'
+
