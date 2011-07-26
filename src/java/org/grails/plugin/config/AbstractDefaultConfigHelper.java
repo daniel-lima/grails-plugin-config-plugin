@@ -308,65 +308,70 @@ public abstract class AbstractDefaultConfigHelper implements
                 .getLog(ConfigObjectProxy.class);
 
         private boolean isCheckedMap;
-        private GroovyObject config;
+        private Map<Object, Object> config;
 
-        public static Object newInstance(GroovyObject config,
+        public static Object newInstance(Map<Object, Object> config,
                 boolean isCheckedMap) {
-            try {
-                ClassLoader cl = config.getClass().getClassLoader();
+            ClassLoader cl = config.getClass().getClassLoader();
 
-                Class<?>[] configInterfaces = config.getClass().getInterfaces();
-                Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>(
-                        Arrays.asList(configInterfaces));
-                final Class<?> mapClass = cl.loadClass(Map.class.getName());
-                interfaces.add(mapClass);
+            Class<?>[] configInterfaces = config.getClass().getInterfaces();
+            Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>(
+                    Arrays.asList(configInterfaces));
+            interfaces.add(Map.class);
+            Assert.isTrue(interfaces.remove(GroovyObject.class));
 
-                GroovyObject result = (GroovyObject) java.lang.reflect.Proxy
-                        .newProxyInstance(cl, interfaces
-                                .toArray(new Class<?>[interfaces.size()]),
-                                new ConfigObjectProxy(config, isCheckedMap));
+            @SuppressWarnings("unchecked")
+            Map<Object, Object> result = (Map<Object, Object>) java.lang.reflect.Proxy
+                    .newProxyInstance(
+                            cl,
+                            interfaces.toArray(new Class<?>[interfaces.size()]),
+                            new ConfigObjectProxy(config, isCheckedMap));
 
-                return result;
-
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            return result;
         }
 
-        private ConfigObjectProxy(GroovyObject config, boolean isCheckedMap) {
+        private ConfigObjectProxy(Map<Object, Object> config,
+                boolean isCheckedMap) {
             this.config = config;
             this.isCheckedMap = isCheckedMap;
         }
 
-        @SuppressWarnings({ "rawtypes" })
+        @SuppressWarnings({ "unchecked" })
         public Object invoke(Object proxy, Method m, Object[] args)
                 throws Throwable {
-            Object result;
+            Object result = null;
             try {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("before method " + m.getName());
                 }
 
-                String methodName = m.getName();
-                if ((methodName.equals("get") || methodName
-                        .equals("getProperty"))
-                        && args != null
-                        && args.length == 1) {
-                    if (isCheckedMap && !((Map) config).containsKey(args[0])) {
-                        throw new IllegalArgumentException("Inexistent key "
-                                + args[0]);
+                if (m.getDeclaringClass().equals(Map.class)
+                        && m.getName().equals("get")) {
+                    boolean containsKey = config.containsKey(args[0]);
+
+                    if (!containsKey) {
+                        result = null;
+
+                        if (isCheckedMap) {
+                            throw new IllegalArgumentException(
+                                    "Inexistent key " + args[0]);
+                        }
                     }
-                    result = ((Map) config).get(args[0]);
-                } else {
+                }
+
+                if (result == null) {
                     result = m.invoke(config, args);
                 }
 
                 if (result != null && result instanceof ConfigObject) {
-                    result = newInstance((GroovyObject) result, isCheckedMap);
+                    result = newInstance((Map<Object, Object>) result,
+                            isCheckedMap);
                 }
-            } catch (Exception e) {
-                throw new RuntimeException("unexpected invocation exception: "
-                        + e.getMessage());
+                /*
+                 * } catch (Exception e) { throw new
+                 * RuntimeException("unexpected invocation exception: " +
+                 * e.getMessage());
+                 */
             } finally {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("after method " + m.getName());

@@ -35,6 +35,28 @@ class ConfigObjectProxyTests extends GrailsUnitTestCase {
     }
     
     
+    void testCheckedMap() {
+        ConfigObject config = loadConfig('PluginConfigDefaultConfig')
+        Map configAsMap = AbstractDefaultConfigHelper.ConfigObjectProxy.newInstance(config, true)
+        
+        assertNotNull configAsMap
+        assertTrue configAsMap instanceof Map
+        assertTrue configAsMap instanceof Writable
+        
+        assertFalse configAsMap.containsKey('groovy')
+        try {
+            configAsMap.groovy
+            fail()
+        } catch (IllegalArgumentException e) {
+            assertTrue true
+        }
+         
+        assertNotNull configAsMap.grails
+        assertNotNull config.groovy 
+        assertNotNull configAsMap.groovy
+    }
+    
+    
     def ConfigObject loadConfig(String className) {
         ClassLoader cl = Thread.currentThread().contextClassLoader ?: this.class.classLoader
         ConfigSlurper cs = new ConfigSlurper(Environment.current.name)
