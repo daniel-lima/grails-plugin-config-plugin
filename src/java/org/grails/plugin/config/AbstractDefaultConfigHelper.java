@@ -23,8 +23,14 @@ import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
 import groovy.util.Eval;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -293,6 +299,81 @@ public abstract class AbstractDefaultConfigHelper implements
         GrailsPluginManager pluginManager = (GrailsPluginManager) parentContext
                 .getBean("pluginManager");
         return pluginManager;
+    }
+    
+    
+    protected static class ConfigObjectProxy implements InvocationHandler {
+
+        private static final Log LOG = LogFactory
+                .getLog(ConfigObjectProxy.class);
+
+        private boolean isCheckedMap;
+        private GroovyObject config;
+
+        public static Object newInstance(GroovyObject config,
+                boolean isCheckedMap) {
+            try {
+                ClassLoader cl = config.getClass().getClassLoader();
+
+                Class<?>[] configInterfaces = config.getClass().getInterfaces();
+                Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>(
+                        Arrays.asList(configInterfaces));
+                final Class<?> mapClass = cl.loadClass(Map.class.getName());
+                interfaces.add(mapClass);
+
+                GroovyObject result = (GroovyObject) java.lang.reflect.Proxy
+                        .newProxyInstance(cl, interfaces
+                                .toArray(new Class<?>[interfaces.size()]),
+                                new ConfigObjectProxy(config, isCheckedMap));
+
+                return result;
+
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private ConfigObjectProxy(GroovyObject config, boolean isCheckedMap) {
+            this.config = config;
+            this.isCheckedMap = isCheckedMap;
+        }
+
+        @SuppressWarnings({ "rawtypes" })
+        public Object invoke(Object proxy, Method m, Object[] args)
+                throws Throwable {
+            Object result;
+            try {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("before method " + m.getName());
+                }
+
+                String methodName = m.getName();
+                if ((methodName.equals("get") || methodName
+                        .equals("getProperty"))
+                        && args != null
+                        && args.length == 1) {
+                    if (isCheckedMap && !((Map) config).containsKey(args[0])) {
+                        throw new IllegalArgumentException("Inexistent key "
+                                + args[0]);
+                    }
+                    result = ((Map) config).get(args[0]);
+                } else {
+                    result = m.invoke(config, args);
+                }
+
+                if (result != null && result instanceof ConfigObject) {
+                    result = newInstance((GroovyObject) result, isCheckedMap);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("unexpected invocation exception: "
+                        + e.getMessage());
+            } finally {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("after method " + m.getName());
+                }
+            }
+            return result;
+        }
     }
 
 }
