@@ -50,7 +50,7 @@ import org.springframework.util.Assert;
  * @author Daniel Henrique Alves Lima
  * 
  */
-public abstract class AbstractDefaultConfigHelper implements
+public abstract class AbstractConfigHelper implements
         PluginManagerAware, GrailsApplicationAware, InitializingBean {
 
     private static final String GRAILS_PLUGIN_SUFFIX = "GrailsPlugin";

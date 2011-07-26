@@ -1,6 +1,6 @@
 package org.plugin.config
 
-import org.grails.plugin.config.AbstractDefaultConfigHelper;
+import org.grails.plugin.config.AbstractConfigHelper;
 import org.springframework.jmx.export.assembler.AbstractConfigurableMBeanInfoAssembler;
 
 import grails.test.*

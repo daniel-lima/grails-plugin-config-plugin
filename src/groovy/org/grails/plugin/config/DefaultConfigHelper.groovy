@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
  * @author Daniel Henrique Alves Lima
  *
  */
-class DefaultConfigHelper extends AbstractDefaultConfigHelper {
+class DefaultConfigHelper extends AbstractConfigHelper {
 
     @Override
     public void enhanceGrailsApplication(GrailsPluginManager pluginManager,
@@ -78,7 +78,7 @@ class DefaultConfigHelper extends AbstractDefaultConfigHelper {
         if (!mc.respondsTo(ConfigObject, 'asMap')) {
             mc.asMap = {boolean checked = false ->
                 ConfigObject delegate = (ConfigObject) delegate
-                return ConfigObjectProxy.newInstance(delegate, checked) 
+                return AbstractConfigHelper.ConfigObjectProxy.newInstance(delegate, checked) 
             }           
             
             assert mc.respondsTo(ConfigObject, 'asMap')

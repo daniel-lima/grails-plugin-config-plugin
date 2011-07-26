@@ -101,5 +101,10 @@ class DefaultConfigHelperTests extends GroovyTestCase {
         assertEquals 'abc', cfgAsMap.grails.plugins.second.value1
         assertNull cfgAsMap.grails.plugins.second.value_1
         assertEquals 'Plugin3-2', cfgAsMap.grails.plugins.second.value2
+        
+        
+        grailsApplication.mergedConfig.asMap(false)
+        grailsApplication.mergedConfig.asMap(true)
+        grailsApplication.mergedConfig.asMap()
     }
 }
