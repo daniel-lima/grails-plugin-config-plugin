@@ -79,8 +79,7 @@ class DefaultConfigHelperTests extends GroovyTestCase {
         
     }
     
-    void testAfterConfigMerge() {
-        
+    void testAfterConfigMerge() {        
         assertEquals 'Plugin3', System.properties.firstPluginAfterConfigMerge    
     }
     
@@ -91,5 +90,16 @@ class DefaultConfigHelperTests extends GroovyTestCase {
         configHelper.notifyConfigChange(grailsApplication)
         assertNotSame mergedConfig, grailsApplication.mergedConfig
         assertEquals mergedConfig, grailsApplication.mergedConfig
+    }
+    
+    void testAsMap() {
+        ConfigObject cfg = grailsApplication.mergedConfig
+        Map cfgAsMap = cfg.asMap(false)
+        assertNotNull cfgAsMap
+        
+        
+        assertEquals 'abc', cfgAsMap.grails.plugins.second.value1
+        assertNull cfgAsMap.grails.plugins.second.value_1
+        assertEquals 'Plugin3-2', cfgAsMap.grails.plugins.second.value2
     }
 }

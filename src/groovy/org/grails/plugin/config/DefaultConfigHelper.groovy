@@ -52,6 +52,7 @@ class DefaultConfigHelper extends AbstractDefaultConfigHelper {
         }
         
         assert mc.respondsTo(grailsApplication, 'getMergedConfig')
+        enhanceConfigObjectClass()
     }
 
     @Override
@@ -65,6 +66,22 @@ class DefaultConfigHelper extends AbstractDefaultConfigHelper {
             grailsApplication._mergedConfig = null
         } else {
             super.enhanceGrailsApplication grailsApplication
+        }
+    }
+    
+    protected void enhanceConfigObjectClass() {
+        if (log.isDebugEnabled()) {
+            log.debug("Enhancing ${ConfigObject}")
+        }
+        
+        MetaClass mc = ConfigObject.metaClass
+        if (!mc.respondsTo(ConfigObject, 'asMap')) {
+            mc.asMap = {boolean checked = false ->
+                ConfigObject delegate = (ConfigObject) delegate
+                return ConfigObjectProxy.newInstance(delegate, checked) 
+            }           
+            
+            assert mc.respondsTo(ConfigObject, 'asMap')
         }
     }
 }
