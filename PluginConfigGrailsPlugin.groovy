@@ -17,9 +17,9 @@ import org.grails.plugin.config.DefaultConfigHelper
 
 class PluginConfigGrailsPlugin {
     // the plugin version
-    def version = "0.1.2"
+    def version = '0.1.3'
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "1.2.0 > *"
+    def grailsVersion = '1.2.0 > *'
     // the other plugins this plugin depends on
     def dependsOn = ['core': '* > 1.0']
 
@@ -37,7 +37,7 @@ class PluginConfigGrailsPlugin {
     // TODO Fill in these fields
     def author = "Daniel Henrique Alves Lima"
     def authorEmail = "email_daniel_h@yahoo.com.br"
-    def title = "Plugin to simplify plugin configuration tasks"
+    def title = 'Grails Plugin Config Plugin'
     def description = '''\\
 Plugin to simplify plugin configuration tasks.
 '''

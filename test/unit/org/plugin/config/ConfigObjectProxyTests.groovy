@@ -10,7 +10,7 @@ class ConfigObjectProxyTests extends GrailsUnitTestCase {
     
     void testUncheckedMap() {        
         ConfigObject config = loadConfig('PluginConfigDefaultConfig')
-        Map configAsMap = AbstractDefaultConfigHelper.ConfigObjectProxy.newInstance(config, false)
+        Map configAsMap = AbstractConfigHelper.ConfigObjectProxy.newInstance(config, false)
         
         assertNotNull configAsMap
         assertTrue configAsMap instanceof Map
@@ -37,7 +37,7 @@ class ConfigObjectProxyTests extends GrailsUnitTestCase {
     
     void testCheckedMap() {
         ConfigObject config = loadConfig('PluginConfigDefaultConfig')
-        Map configAsMap = AbstractDefaultConfigHelper.ConfigObjectProxy.newInstance(config, true)
+        Map configAsMap = AbstractConfigHelper.ConfigObjectProxy.newInstance(config, true)
         
         assertNotNull configAsMap
         assertTrue configAsMap instanceof Map

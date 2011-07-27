@@ -77,6 +77,7 @@ class DefaultConfigHelperTests extends GroovyTestCase {
         assertEquals 'plugin3 has some value here', thirdConfig.grails.plugins.third.valueToOverride
         assertEquals 'app has a different value', mergedConfig.grails.plugins.third.valueToOverride
         
+        assertEquals 'plugin4', mergedConfig.grails.plugins.fourth.value1
     }
     
     void testAfterConfigMerge() {        
