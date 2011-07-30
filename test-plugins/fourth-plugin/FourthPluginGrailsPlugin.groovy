@@ -27,24 +27,28 @@ Brief description of the plugin.
         // TODO Implement additions to web.xml (optional), this event occurs before 
         Assert.notNull application
         Assert.notNull application.mergedConfig
+        Assert.isTrue 'plugin4'.equals(application.mergedConfig.grails.plugins.fourth.value1)
     }
 
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
         Assert.notNull application
         Assert.notNull application.mergedConfig
+        Assert.isTrue 'plugin4'.equals(application.mergedConfig.grails.plugins.fourth.value1)
     }
 
     def doWithDynamicMethods = { ctx ->
         // TODO Implement registering dynamic methods to classes (optional)
         Assert.notNull application
         Assert.notNull application.mergedConfig
+        Assert.isTrue 'plugin4'.equals(application.mergedConfig.grails.plugins.fourth.value1)
     }
 
     def doWithApplicationContext = { applicationContext ->
         // TODO Implement post initialization spring config (optional)
         Assert.notNull application
         Assert.notNull application.mergedConfig
+        Assert.isTrue 'plugin4'.equals(application.mergedConfig.grails.plugins.fourth.value1)
     }
 
     def onChange = { event ->
@@ -54,6 +58,7 @@ Brief description of the plugin.
 
         Assert.notNull application
         Assert.notNull application.mergedConfig
+        Assert.isTrue 'plugin4'.equals(application.mergedConfig.grails.plugins.fourth.value1)
     }
 
     def onConfigChange = { event ->
@@ -62,5 +67,6 @@ Brief description of the plugin.
 
         Assert.notNull application
         Assert.notNull application.mergedConfig
+        Assert.isTrue 'plugin4'.equals(application.mergedConfig.grails.plugins.fourth.value1)
     }
 }

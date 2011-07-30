@@ -51,7 +51,7 @@ class DefaultConfigHelper extends AbstractConfigHelper {
             }
         }
         
-        assert mc.respondsTo(grailsApplication, 'getMergedConfig')
+        Assert.notEmpty mc.respondsTo(grailsApplication, 'getMergedConfig')
         enhanceConfigObjectClass()
     }
 
@@ -81,7 +81,7 @@ class DefaultConfigHelper extends AbstractConfigHelper {
                 return AbstractConfigHelper.ConfigObjectProxy.newInstance(delegate, checked) 
             }           
             
-            assert mc.respondsTo(ConfigObject, 'asMap')
+            Assert.notEmpty mc.respondsTo(ConfigObject, 'asMap')
         }
     }
 }

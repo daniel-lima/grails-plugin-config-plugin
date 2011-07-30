@@ -49,6 +49,7 @@ Brief description of the plugin.
     }
 
     def afterConfigMerge = {config ->
+        println "afterConfigMerge ${config.grails.plugins.third.value1}"
         System.setProperty('firstPluginAfterConfigMerge', config.grails.plugins.third.value1)
     }
 }

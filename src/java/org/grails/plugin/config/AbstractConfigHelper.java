@@ -153,6 +153,14 @@ public abstract class AbstractConfigHelper implements
 
                 defaultConfigClass = grailsApplication
                         .getClassForName(configName);
+                if (defaultConfigClass == null) {
+                    /* When called from doWithWebDescriptor, classes aren't loaded yet. */
+                    try {
+                        defaultConfigClass = grailsApplication.getClassLoader().loadClass(configName);
+                        //defaultConfigClass = null;
+                    } catch (ClassNotFoundException e) {                       
+                    }
+                }
 
                 if (defaultConfigClass != null) {
                     /* The class is inside one grails-app subdirectory. */
