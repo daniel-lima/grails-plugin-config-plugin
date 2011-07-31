@@ -39,8 +39,6 @@ import org.codehaus.groovy.grails.commons.cfg.ConfigurationHelper;
 import org.codehaus.groovy.grails.plugins.GrailsPlugin;
 import org.codehaus.groovy.grails.plugins.GrailsPluginManager;
 import org.codehaus.groovy.grails.plugins.PluginManagerAware;
-import org.codehaus.groovy.grails.plugins.support.aware.GrailsApplicationAware;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 
@@ -49,32 +47,15 @@ import org.springframework.util.Assert;
  * @author Daniel Henrique Alves Lima
  * 
  */
-public abstract class AbstractConfigHelper implements PluginManagerAware,
-        GrailsApplicationAware, InitializingBean {
+public abstract class AbstractConfigHelper implements PluginManagerAware {
 
     private static final String GRAILS_PLUGIN_SUFFIX = "GrailsPlugin";
     private static final String DEFAULT_CONFIG_SUFFIX = "DefaultConfig";
 
     protected final Log log = LogFactory.getLog(getClass());
-    private GrailsApplication grailsApplication;
     private GrailsPluginManager pluginManager;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("afterPropertiesSet()");
-        }
-        enhanceGrailsApplication(this.grailsApplication);
-    }
-
-    @Override
-    public void setGrailsApplication(GrailsApplication grailsApplication) {
-        if (log.isDebugEnabled()) {
-            log.debug("setGrailsApplication(): " + grailsApplication);
-        }
-        this.grailsApplication = grailsApplication;
-    }
-
+   
     @Override
     public void setPluginManager(GrailsPluginManager pluginManager) {
         if (log.isDebugEnabled()) {
@@ -83,7 +64,7 @@ public abstract class AbstractConfigHelper implements PluginManagerAware,
         this.pluginManager = pluginManager;
     }
 
-    public abstract void enhanceGrailsApplication(GrailsApplication grailsApplication);
+    public abstract void enhanceGrailsApplicationClass();
 
     public abstract void notifyConfigChange();
 

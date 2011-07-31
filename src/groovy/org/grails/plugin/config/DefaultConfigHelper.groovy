@@ -15,9 +15,9 @@
  */
 package org.grails.plugin.config
 
-import org.codehaus.groovy.grails.commons.GrailsApplication;
-import org.codehaus.groovy.grails.plugins.GrailsPluginManager;
-import org.springframework.util.Assert;
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.plugins.GrailsPluginManager
+import org.springframework.util.Assert
 
 /**
  * 
@@ -29,22 +29,21 @@ class DefaultConfigHelper extends AbstractConfigHelper {
     private WeakHashMap appsWitCachedConfig = new WeakHashMap()
 
     @Override
-    public void enhanceGrailsApplication(GrailsApplication grailsApplication) {
+    public void enhanceGrailsApplicationClass() {
         if (log.isDebugEnabled()) {
-            log.debug("Enhancing ${grailsApplication}")
-        }
-        GrailsPluginManager pluginManager = super.getPluginManager(grailsApplication)
+            log.debug("Enhancing ${GrailsApplication}")
+        }        
         
-        MetaClass mc = grailsApplication.metaClass
-        if (!mc.respondsTo(grailsApplication, 'getMergedConfig')) {
+        MetaClass mc = GrailsApplication.metaClass
+        if (!mc.respondsTo(GrailsApplication, 'getMergedConfig')) {
             log.debug('Adding getMergedConfig()')
             
             mc._mergedConfig = null
             mc.getMergedConfig = {boolean reload = false ->
-                
-                
+                                
                 log.debug("delegate ${delegate}")
                 GrailsApplication app = (GrailsApplication) delegate
+                GrailsPluginManager pluginManager = super.getPluginManager(app)
                 log.debug("delegate._mergedConfig ${delegate._mergedConfig?'[...]': 'null'}")
                 if (delegate._mergedConfig == null || reload) {                   
                     delegate._mergedConfig = super.buildMergedConfig(
@@ -56,7 +55,7 @@ class DefaultConfigHelper extends AbstractConfigHelper {
             }
         }
         
-        Assert.notEmpty mc.respondsTo(grailsApplication, 'getMergedConfig')
+        Assert.notEmpty mc.respondsTo(GrailsApplication, 'getMergedConfig')
         enhanceConfigObjectClass()
     }
 
