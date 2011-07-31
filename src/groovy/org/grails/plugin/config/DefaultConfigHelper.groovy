@@ -29,11 +29,12 @@ class DefaultConfigHelper extends AbstractConfigHelper {
     private WeakHashMap appsWitCachedConfig = new WeakHashMap()
 
     @Override
-    public void enhanceGrailsApplication(GrailsPluginManager pluginManager,
-    GrailsApplication grailsApplication) {
+    public void enhanceGrailsApplication(GrailsApplication grailsApplication) {
         if (log.isDebugEnabled()) {
-            log.debug("Enhancing ${grailsApplication} ${pluginManager}")
+            log.debug("Enhancing ${grailsApplication}")
         }
+        GrailsPluginManager pluginManager = super.getPluginManager(grailsApplication)
+        
         MetaClass mc = grailsApplication.metaClass
         if (!mc.respondsTo(grailsApplication, 'getMergedConfig')) {
             log.debug('Adding getMergedConfig()')

@@ -21,7 +21,6 @@ import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
-import groovy.util.Eval;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -65,7 +64,7 @@ public abstract class AbstractConfigHelper implements PluginManagerAware,
         if (log.isDebugEnabled()) {
             log.debug("afterPropertiesSet()");
         }
-        enhanceGrailsApplication(this.pluginManager, this.grailsApplication);
+        enhanceGrailsApplication(this.grailsApplication);
     }
 
     @Override
@@ -84,15 +83,7 @@ public abstract class AbstractConfigHelper implements PluginManagerAware,
         this.pluginManager = pluginManager;
     }
 
-
-    public abstract void enhanceGrailsApplication(
-            GrailsPluginManager pluginManager,
-            GrailsApplication grailsApplication);
-
-    public void enhanceGrailsApplication(GrailsApplication grailsApplication) {
-        enhanceGrailsApplication(getPluginManager(grailsApplication),
-                grailsApplication);
-    }
+    public abstract void enhanceGrailsApplication(GrailsApplication grailsApplication);
 
     public abstract void notifyConfigChange();
 
@@ -294,9 +285,33 @@ public abstract class AbstractConfigHelper implements PluginManagerAware,
 
     protected GrailsPluginManager getPluginManager(
             GrailsApplication grailsApplication) {
-        ApplicationContext parentContext = grailsApplication.getParentContext();
-        GrailsPluginManager pluginManager = (GrailsPluginManager) parentContext
-                .getBean("pluginManager");
+        GrailsPluginManager pluginManager = null;
+
+        {
+            ApplicationContext mainContext = grailsApplication.getMainContext();
+            if (mainContext != null) {
+                pluginManager = (GrailsPluginManager) mainContext
+                        .getBean("pluginManager");
+
+            }
+        }
+
+        if (pluginManager == null) {
+            ApplicationContext mainContext = grailsApplication
+                    .getParentContext();
+            if (mainContext != null) {
+                pluginManager = (GrailsPluginManager) mainContext
+                        .getBean("pluginManager");
+
+            }
+        }
+
+        if (pluginManager == null) {
+            pluginManager = this.pluginManager;
+        }
+
+        Assert.notNull(pluginManager);
+
         return pluginManager;
     }
 
