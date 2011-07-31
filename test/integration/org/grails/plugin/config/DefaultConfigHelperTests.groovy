@@ -7,20 +7,7 @@ import grails.util.Environment;
 
 class DefaultConfigHelperTests extends GroovyTestCase {
 
-    def grailsApplication
-    def configHelper 
-    
-    @Override
-    void setUp() {
-        super.setUp()
-        configHelper = grailsApplication.mainContext.getBean(DefaultConfigHelper.class.name) 
-    }
-    
-    void testConfigHelperInstance() {
-        assertNotNull configHelper
-        assertTrue configHelper instanceof DefaultConfigHelper
-    }
-    
+    def grailsApplication     
 
     void testMergedConfigInstance() {
         ConfigObject mergedConfig = grailsApplication.mergedConfig
@@ -83,7 +70,7 @@ class DefaultConfigHelperTests extends GroovyTestCase {
     void testNotifyConfigChange() {
         ConfigObject mergedConfig = grailsApplication.mergedConfig
         assertSame mergedConfig, grailsApplication.mergedConfig
-        configHelper.notifyConfigChange()
+        //configHelper.notifyConfigChange()
         assertNotSame mergedConfig, grailsApplication.mergedConfig
         assertEquals mergedConfig, grailsApplication.mergedConfig
     }

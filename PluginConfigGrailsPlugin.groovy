@@ -68,9 +68,6 @@ Plugin to simplify plugin configuration tasks.
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
         //println "${this.class}.doWithSpring()"
-        "${DefaultConfigHelper.class.name}"(DefaultConfigHelper) {bean ->
-            bean.autowire = 'byName'
-        }
         configHelper.defaultPluginManager = manager
         configHelper.enhanceClasses()
     }
@@ -89,14 +86,12 @@ Plugin to simplify plugin configuration tasks.
         // TODO Implement code that is executed when any artefact that this plugin is
         // watching is modified and reloaded. The event contains: event.source,
         // event.application, event.manager, event.ctx, and event.plugin.
-        event.ctx.getBean("${DefaultConfigHelper.class.name}").notifyConfigChange()
         configHelper.notifyConfigChange()
     }
 
     def onConfigChange = { event ->
         // TODO Implement code that is executed when the project configuration changes.
         // The event is the same as for 'onChange'.
-        event.ctx.getBean("${DefaultConfigHelper.class.name}").notifyConfigChange()
         configHelper.notifyConfigChange()
     }
 }
