@@ -61,20 +61,19 @@ Plugin to simplify plugin configuration tasks.
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
         //println "${this.class}.doWithWebDescriptor()"
-        configHelper.defaultPluginManager = manager
-        configHelper.enhanceClasses()        
+        enhanceClasses(manager)
     }
 
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
         //println "${this.class}.doWithSpring()"
-        configHelper.defaultPluginManager = manager
-        configHelper.enhanceClasses()
+        enhanceClasses(manager)
     }
 
     def doWithDynamicMethods = { ctx ->
         // TODO Implement registering dynamic methods to classes (optional)
         //println "${this.class}.doWithDynamicMethod()"
+        enhanceClasses(manager)
     }
 
     def doWithApplicationContext = { applicationContext ->
@@ -93,5 +92,11 @@ Plugin to simplify plugin configuration tasks.
         // TODO Implement code that is executed when the project configuration changes.
         // The event is the same as for 'onChange'.
         configHelper.notifyConfigChange()
+    }
+    
+    
+    private def enhanceClasses = {pluginManager ->
+        configHelper.defaultPluginManager = pluginManager
+        configHelper.enhanceClasses()
     }
 }
