@@ -61,8 +61,8 @@ Plugin to simplify plugin configuration tasks.
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
         //println "${this.class}.doWithWebDescriptor()"
-        configHelper.pluginManager = manager
-        configHelper.enhanceGrailsApplicationClass()        
+        configHelper.defaultPluginManager = manager
+        configHelper.enhanceClasses()        
     }
 
     def doWithSpring = {
@@ -71,8 +71,8 @@ Plugin to simplify plugin configuration tasks.
         "${DefaultConfigHelper.class.name}"(DefaultConfigHelper) {bean ->
             bean.autowire = 'byName'
         }
-        configHelper.pluginManager = manager
-        configHelper.enhanceGrailsApplicationClass()
+        configHelper.defaultPluginManager = manager
+        configHelper.enhanceClasses()
     }
 
     def doWithDynamicMethods = { ctx ->

@@ -29,35 +29,11 @@ class DefaultConfigHelper extends AbstractConfigHelper {
     private WeakHashMap appsWitCachedConfig = new WeakHashMap()
 
     @Override
-    public void enhanceGrailsApplicationClass() {
-        if (log.isDebugEnabled()) {
-            log.debug("Enhancing ${GrailsApplication}")
-        }        
-        
-        MetaClass mc = GrailsApplication.metaClass
-        if (!mc.respondsTo(GrailsApplication, 'getMergedConfig')) {
-            log.debug('Adding getMergedConfig()')
-            
-            mc._mergedConfig = null
-            mc.getMergedConfig = {boolean reload = false ->
-                                
-                log.debug("delegate ${delegate}")
-                GrailsApplication app = (GrailsApplication) delegate
-                GrailsPluginManager pluginManager = super.getPluginManager(app)
-                log.debug("delegate._mergedConfig ${delegate._mergedConfig?'[...]': 'null'}")
-                if (delegate._mergedConfig == null || reload) {                   
-                    delegate._mergedConfig = super.buildMergedConfig(
-                        pluginManager, app);
-                    appsWitCachedConfig.put(app, null)
-                }
-
-                return delegate._mergedConfig
-            }
-        }
-        
-        Assert.notEmpty mc.respondsTo(GrailsApplication, 'getMergedConfig')
+    public void enhanceClasses() {
+        enhanceGrailsApplicationClass()
         enhanceConfigObjectClass()
     }
+
 
     @Override
     public void notifyConfigChange() {
@@ -74,7 +50,38 @@ class DefaultConfigHelper extends AbstractConfigHelper {
         } 
         appsWitCachedConfig.clear()
     }
+
     
+    protected void enhanceGrailsApplicationClass() {
+        if (log.isDebugEnabled()) {
+            log.debug("Enhancing ${GrailsApplication}")
+        }
+
+        MetaClass mc = GrailsApplication.metaClass
+        if (!mc.respondsTo(GrailsApplication, 'getMergedConfig')) {
+            log.debug('Adding getMergedConfig()')
+
+            mc._mergedConfig = null
+            mc.getMergedConfig = {boolean reload = false ->
+
+                log.debug("delegate ${delegate}")
+                GrailsApplication app = (GrailsApplication) delegate
+                GrailsPluginManager pluginManager = super.getPluginManager(app)
+                log.debug("delegate._mergedConfig ${delegate._mergedConfig?'[...]': 'null'}")
+                if (delegate._mergedConfig == null || reload) {
+                    delegate._mergedConfig = super.buildMergedConfig(
+                            pluginManager, app);
+                    appsWitCachedConfig.put(app, null)
+                }
+
+                return delegate._mergedConfig
+            }
+        }
+
+        Assert.notEmpty mc.respondsTo(GrailsApplication, 'getMergedConfig')
+    }
+
+        
     protected void enhanceConfigObjectClass() {
         if (log.isDebugEnabled()) {
             log.debug("Enhancing ${ConfigObject}")

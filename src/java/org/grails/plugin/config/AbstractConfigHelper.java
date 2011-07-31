@@ -47,24 +47,23 @@ import org.springframework.util.Assert;
  * @author Daniel Henrique Alves Lima
  * 
  */
-public abstract class AbstractConfigHelper implements PluginManagerAware {
+public abstract class AbstractConfigHelper  {
 
     private static final String GRAILS_PLUGIN_SUFFIX = "GrailsPlugin";
     private static final String DEFAULT_CONFIG_SUFFIX = "DefaultConfig";
 
     protected final Log log = LogFactory.getLog(getClass());
-    private GrailsPluginManager pluginManager;
+    private GrailsPluginManager defaultPluginManager;
 
    
-    @Override
-    public void setPluginManager(GrailsPluginManager pluginManager) {
+    public void setDefaultPluginManager(GrailsPluginManager defaultPluginManager) {
         if (log.isDebugEnabled()) {
-            log.debug("setPluginManager(): " + pluginManager);
+            log.debug("setPluginManager(): " + defaultPluginManager);
         }
-        this.pluginManager = pluginManager;
+        this.defaultPluginManager = defaultPluginManager;
     }
 
-    public abstract void enhanceGrailsApplicationClass();
+    public abstract void enhanceClasses();
 
     public abstract void notifyConfigChange();
 
@@ -288,7 +287,7 @@ public abstract class AbstractConfigHelper implements PluginManagerAware {
         }
 
         if (pluginManager == null) {
-            pluginManager = this.pluginManager;
+            pluginManager = this.defaultPluginManager;
         }
 
         Assert.notNull(pluginManager);
