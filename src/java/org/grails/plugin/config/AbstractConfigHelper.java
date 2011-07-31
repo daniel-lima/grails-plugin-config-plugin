@@ -84,26 +84,6 @@ public abstract class AbstractConfigHelper implements PluginManagerAware,
         this.pluginManager = pluginManager;
     }
 
-    // @Override
-    public ConfigObject getMergedConfig(GrailsApplication grailsApplication) {
-        GrailsPluginManager pluginManager = getPluginManager(grailsApplication);
-        return getMergedConfig(pluginManager, grailsApplication);
-    }
-
-    // @Override
-    public ConfigObject getMergedConfig(GrailsPluginManager pluginManager,
-            GrailsApplication grailsApplication) {
-        enhanceGrailsApplication(pluginManager, grailsApplication);
-
-        ConfigObject mergedConfig = (ConfigObject) Eval.x(grailsApplication,
-                "x.mergedConfig");
-        return mergedConfig;
-    }
-
-    // @Override
-    public ConfigObject getMergedConfig() {
-        return getMergedConfig(this.pluginManager, this.grailsApplication);
-    }
 
     public abstract void enhanceGrailsApplication(
             GrailsPluginManager pluginManager,

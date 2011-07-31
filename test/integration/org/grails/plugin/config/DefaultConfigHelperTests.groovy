@@ -23,14 +23,9 @@ class DefaultConfigHelperTests extends GroovyTestCase {
     
 
     void testMergedConfigInstance() {
-        ConfigObject mergedConfig = configHelper.mergedConfig
+        ConfigObject mergedConfig = grailsApplication.mergedConfig
         assertNotNull mergedConfig
-        assertNotSame mergedConfig, grailsApplication.config
-        assertSame mergedConfig, configHelper.mergedConfig
-        assertSame mergedConfig, configHelper.mergedConfig
-        assertEquals mergedConfig, configHelper.mergedConfig
-        mergedConfig = grailsApplication.mergedConfig
-        assertNotNull mergedConfig
+        assertNotSame mergedConfig, grailsApplication.config        
         assertSame mergedConfig, grailsApplication.mergedConfig
         assertSame mergedConfig, grailsApplication.mergedConfig
         assertEquals mergedConfig, grailsApplication.mergedConfig
