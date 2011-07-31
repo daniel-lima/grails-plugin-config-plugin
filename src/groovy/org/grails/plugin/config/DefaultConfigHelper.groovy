@@ -25,6 +25,8 @@ import org.springframework.util.Assert;
  *
  */
 class DefaultConfigHelper extends AbstractConfigHelper {
+    
+    private WeakHashMap appsWitCachedConfig = new WeakHashMap()
 
     @Override
     public void enhanceGrailsApplication(GrailsPluginManager pluginManager,
@@ -41,10 +43,12 @@ class DefaultConfigHelper extends AbstractConfigHelper {
                 
                 
                 log.debug("delegate ${delegate}")
+                GrailsApplication app = (GrailsApplication) delegate
                 log.debug("delegate._mergedConfig ${delegate._mergedConfig?'[...]': 'null'}")
-                if (delegate._mergedConfig == null || reload) {
+                if (delegate._mergedConfig == null || reload) {                   
                     delegate._mergedConfig = super.buildMergedConfig(
-                        pluginManager, grailsApplication);
+                        pluginManager, app);
+                    appsWitCachedConfig.put(app, null)
                 }
 
                 return delegate._mergedConfig
@@ -56,17 +60,19 @@ class DefaultConfigHelper extends AbstractConfigHelper {
     }
 
     @Override
-    public void notifyConfigChange(GrailsApplication grailsApplication) {
+    public void notifyConfigChange() {
         if (log.isDebugEnabled()) {
-            log.debug("Notifying config change ${grailsApplication}")
+            log.debug("Notifying config change for ${appsWitCachedConfig.keySet()}")
         }
-        MetaClass mc = grailsApplication.metaClass
-        if (mc.respondsTo(grailsApplication, 'getMergedConfig')) {
-            log.debug("Clearing _mergedConfig")
-            grailsApplication._mergedConfig = null
-        } else {
-            super.enhanceGrailsApplication grailsApplication
-        }
+        for (app in appsWitCachedConfig.keySet()) {
+            GrailsApplication grailsApplication = (GrailsApplication) app
+            MetaClass mc = grailsApplication.metaClass
+            if (mc.respondsTo(grailsApplication, 'getMergedConfig')) {
+                log.debug("Clearing _mergedConfig for ${grailsApplication}")
+                grailsApplication._mergedConfig = null
+            } 
+        } 
+        appsWitCachedConfig.clear()
     }
     
     protected void enhanceConfigObjectClass() {

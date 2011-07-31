@@ -50,8 +50,8 @@ import org.springframework.util.Assert;
  * @author Daniel Henrique Alves Lima
  * 
  */
-public abstract class AbstractConfigHelper implements
-        PluginManagerAware, GrailsApplicationAware, InitializingBean {
+public abstract class AbstractConfigHelper implements PluginManagerAware,
+        GrailsApplicationAware, InitializingBean {
 
     private static final String GRAILS_PLUGIN_SUFFIX = "GrailsPlugin";
     private static final String DEFAULT_CONFIG_SUFFIX = "DefaultConfig";
@@ -114,7 +114,7 @@ public abstract class AbstractConfigHelper implements
                 grailsApplication);
     }
 
-    public abstract void notifyConfigChange(GrailsApplication grailsApplication);
+    public abstract void notifyConfigChange();
 
     protected ConfigObject buildMergedConfig(GrailsPluginManager pluginManager,
             GrailsApplication grailsApplication) {
@@ -132,6 +132,13 @@ public abstract class AbstractConfigHelper implements
          * processing order.
          */
         List<Closure> afterConfigMergeClosures = new ArrayList<Closure>();
+        boolean classesLoaded = false;
+        if (grailsApplication.isInitialised()) {
+            Class<?>[] classes = grailsApplication.getAllClasses();
+            if (classes != null && classes.length > 0) {
+                classesLoaded = true;
+            }
+        }
         for (GrailsPlugin plugin : pluginManager.getAllPlugins()) {
             if (plugin.isEnabled()) {
                 Class<?> defaultConfigClass = null;
@@ -151,20 +158,24 @@ public abstract class AbstractConfigHelper implements
                     log.debug("getMergedConfigImpl(): configName " + configName);
                 }
 
-                defaultConfigClass = grailsApplication
-                        .getClassForName(configName);
-                if (defaultConfigClass == null) {
-                    /* When called from doWithWebDescriptor, classes aren't loaded yet. */
+                if (classesLoaded) {
+                    defaultConfigClass = grailsApplication
+                            .getClassForName(configName);
+                } else {
+                    /*
+                     * When called from doWithWebDescriptor, classes aren't
+                     * loaded yet.
+                     */
                     try {
-                        defaultConfigClass = grailsApplication.getClassLoader().loadClass(configName);
-                        //defaultConfigClass = null;
-                    } catch (ClassNotFoundException e) {                       
+                        defaultConfigClass = grailsApplication.getClassLoader()
+                                .loadClass(configName);
+                        // defaultConfigClass = null;
+                    } catch (ClassNotFoundException e) {
                     }
                 }
 
                 if (defaultConfigClass != null) {
                     /* The class is inside one grails-app subdirectory. */
-
                     pluginClassMetadata = pluginClass
                             .getAnnotation(org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin.class);
 
@@ -308,8 +319,7 @@ public abstract class AbstractConfigHelper implements
                 .getBean("pluginManager");
         return pluginManager;
     }
-    
-    
+
     protected static class ConfigObjectProxy implements InvocationHandler {
 
         private static final Log LOG = LogFactory

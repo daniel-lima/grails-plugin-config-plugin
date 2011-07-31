@@ -88,7 +88,7 @@ class DefaultConfigHelperTests extends GroovyTestCase {
     void testNotifyConfigChange() {
         ConfigObject mergedConfig = grailsApplication.mergedConfig
         assertSame mergedConfig, grailsApplication.mergedConfig
-        configHelper.notifyConfigChange(grailsApplication)
+        configHelper.notifyConfigChange()
         assertNotSame mergedConfig, grailsApplication.mergedConfig
         assertEquals mergedConfig, grailsApplication.mergedConfig
     }
