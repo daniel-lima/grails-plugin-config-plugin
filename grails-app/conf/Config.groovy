@@ -26,4 +26,4 @@ log4j = {
 }
 
 grails.plugins.third.valueToOverride = 'app has a different value'
-
+grails.plugins.first.valueToOverride = null

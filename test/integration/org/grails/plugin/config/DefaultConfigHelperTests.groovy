@@ -44,7 +44,9 @@ class DefaultConfigHelperTests extends GroovyTestCase {
     void testPluginMergedConfig() {
         
         ConfigObject mergedConfig = grailsApplication.mergedConfig
+        ConfigObject firstConfig = new ConfigSlurper().parse(grailsApplication.mainContext.classLoader.loadClass('FirstPluginDefaultConfig'))
         ConfigObject thirdConfig = new ConfigSlurper().parse(grailsApplication.mainContext.classLoader.loadClass('ThirdPluginDefaultConfig'))
+        println "firstConfig ${firstConfig}"
         println "thirdConfig ${thirdConfig}"
         
         assertEquals true, mergedConfig.grails.plugins.first.value1
@@ -58,6 +60,9 @@ class DefaultConfigHelperTests extends GroovyTestCase {
         
         assertEquals 'plugin3 has some value here', thirdConfig.grails.plugins.third.valueToOverride
         assertEquals 'app has a different value', mergedConfig.grails.plugins.third.valueToOverride
+        
+        assertEquals 'not null value', firstConfig.grails.plugins.first.valueToOverride
+        assertEquals null, mergedConfig.grails.plugins.first.valueToOverride
         
         assertEquals 'plugin4', mergedConfig.grails.plugins.fourth.value1
     }

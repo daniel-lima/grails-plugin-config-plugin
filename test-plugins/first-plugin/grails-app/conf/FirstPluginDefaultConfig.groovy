@@ -6,7 +6,7 @@ grails {
             
             value1 = true
             value2 = 'plugin1'
-
+            valueToOverride = 'not null value'
         }
 
     }
