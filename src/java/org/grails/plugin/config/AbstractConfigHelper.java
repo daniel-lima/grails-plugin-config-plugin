@@ -26,6 +26,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -170,9 +172,9 @@ public abstract class AbstractConfigHelper  {
                     Closure c = null;
                     if (o instanceof Closure) {
                         c = (Closure) o;
-                        if (c.getMaximumNumberOfParameters() == 1) {
+                        if (c.getMaximumNumberOfParameters() > 0) {
                             afterConfigMergeClosures.add(c);
-                            c.setDelegate(plugin);
+                            //c.setDelegate(plugin);
                         } else {
                             c = null;
                         }
@@ -225,13 +227,26 @@ public abstract class AbstractConfigHelper  {
          * Executed the collected closures. It's the last chance of influencing
          * the merged config.
          */
-        for (Closure closure : afterConfigMergeClosures) {
-            try {
-                closure.call(config);
-            } catch (RuntimeException e) {
-                log.error(
-                        "getMergedConfigImpl(): error executing afterConfigClosure",
-                        e);
+        {
+            Map<String, Object> ctx = new LinkedHashMap<String, Object>();
+            ctx.put("appConfig", grailsApplication.getConfig());
+            ctx = Collections.unmodifiableMap(ctx);
+
+            Object arg = config;
+            Object [] args = new Object[] { config, ctx };
+
+            for (Closure closure : afterConfigMergeClosures) {
+                try {
+                    if (closure.getMaximumNumberOfParameters() == 1) {
+                        closure.call(arg);
+                    } else {
+                        closure.call(args);
+                    }
+                } catch (RuntimeException e) {
+                    log.error(
+                            "getMergedConfigImpl(): error executing afterConfigClosure",
+                            e);
+                }
             }
         }
 

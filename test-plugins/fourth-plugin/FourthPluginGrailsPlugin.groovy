@@ -69,4 +69,8 @@ Brief description of the plugin.
         Assert.notNull application.mergedConfig
         Assert.isTrue 'plugin4'.equals(application.mergedConfig.grails.plugins.fourth.value1)
     }
+    
+    def afterConfigMerge = {config ->
+        System.setProperty('fourthPluginAfterConfigMerge', 'true')
+    }
 }

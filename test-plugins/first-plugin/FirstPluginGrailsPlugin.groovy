@@ -50,11 +50,11 @@ Brief description of the plugin.
         // The event is the same as for 'onChange'.
     }
 
-    def afterConfigMerge = {config ->
+    def afterConfigMerge = {config, ctx ->
         println "afterConfigMerge ${config.grails.plugins.third.value1}"
-        Assert.notNull(application)
-        Assert.notNull(manager)
-        println "afterConfigMerge ${application}"
+        println "afterConfigMerge ${ctx}"
+        Assert.notNull(ctx)
+        Assert.notNull(ctx.appConfig)
         System.setProperty('firstPluginAfterConfigMerge', config.grails.plugins.third.value1)
     }
 }

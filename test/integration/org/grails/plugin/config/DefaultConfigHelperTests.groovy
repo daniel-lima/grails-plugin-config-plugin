@@ -68,7 +68,8 @@ class DefaultConfigHelperTests extends GroovyTestCase {
     }
     
     void testAfterConfigMerge() {        
-        assertEquals 'Plugin3', System.properties.firstPluginAfterConfigMerge    
+        assertEquals 'Plugin3', System.properties.firstPluginAfterConfigMerge
+        assertEquals 'true', System.properties.fourthPluginAfterConfigMerge
     }
     
     /*
