@@ -172,6 +172,7 @@ public abstract class AbstractConfigHelper  {
                         c = (Closure) o;
                         if (c.getMaximumNumberOfParameters() == 1) {
                             afterConfigMergeClosures.add(c);
+                            c.setDelegate(plugin);
                         } else {
                             c = null;
                         }

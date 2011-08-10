@@ -1,3 +1,5 @@
+import org.springframework.util.Assert;
+
 class FirstPluginGrailsPlugin {
     // the plugin version
     def version = "0.1"
@@ -50,6 +52,9 @@ Brief description of the plugin.
 
     def afterConfigMerge = {config ->
         println "afterConfigMerge ${config.grails.plugins.third.value1}"
+        Assert.notNull(application)
+        Assert.notNull(manager)
+        println "afterConfigMerge ${application}"
         System.setProperty('firstPluginAfterConfigMerge', config.grails.plugins.third.value1)
     }
 }
