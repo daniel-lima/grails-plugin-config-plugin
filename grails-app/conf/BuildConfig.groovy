@@ -12,7 +12,9 @@ grails.project.dependency.resolution = {
     repositories {
         grailsPlugins()
         grailsHome()
-        grailsCentral()
+        if ("$grailsVersion" > "1.2.5") {
+            grailsCentral()
+        }
 
         // uncomment the below to enable remote dependency resolution
         // from public Maven repositories
