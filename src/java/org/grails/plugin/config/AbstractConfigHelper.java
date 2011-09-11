@@ -296,7 +296,7 @@ public abstract class AbstractConfigHelper  {
                     .getParentContext();
             if (mainContext != null) {
                 try {
-                pluginManager = (GrailsPluginManager) mainContext
+                    pluginManager = (GrailsPluginManager) mainContext
                         .getBean("pluginManager");
                 } catch (org.springframework.beans.factory.NoSuchBeanDefinitionException e) {
                     log.warn("getPluginManager()", e);
