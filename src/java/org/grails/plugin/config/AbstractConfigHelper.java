@@ -16,6 +16,7 @@
 package org.grails.plugin.config;
 
 import grails.util.Environment;
+import grails.util.Metadata;
 import groovy.lang.Closure;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
@@ -76,6 +77,9 @@ public abstract class AbstractConfigHelper  {
 
         Assert.notNull(pluginManager);
         Assert.notNull(grailsApplication);
+        
+        Metadata applicationMetaData = (Metadata) grailsApplication.getMetadata();
+        String applicationName = applicationMetaData.getApplicationName();
 
         List<Class<?>> defaultConfigClasses = new ArrayList<Class<?>>();
 
@@ -146,7 +150,10 @@ public abstract class AbstractConfigHelper  {
                             || pluginClassMetadata != null
                             && defaultConfigClassMetadata != null
                             && pluginClassMetadata.name().equals(
-                                    defaultConfigClassMetadata.name())) {
+                                    defaultConfigClassMetadata.name())
+                            || /* Workaround when building this as a Grails 2.0.0 plugin. */ 
+                            applicationName != null
+                            && applicationName.equals(plugin.getFileSystemShortName())) {
                         /* The default config belongs to this plugin. */
                         log.debug("getMergedConfigImpl(): default config found");
                     } else {
@@ -299,6 +306,7 @@ public abstract class AbstractConfigHelper  {
                     pluginManager = (GrailsPluginManager) mainContext
                         .getBean("pluginManager");
                 } catch (org.springframework.beans.factory.NoSuchBeanDefinitionException e) {
+                    /* Workaround for Grails 2.0.0. */
                     log.warn("getPluginManager()", e);
                 }
             }
