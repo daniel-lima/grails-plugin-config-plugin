@@ -337,7 +337,7 @@ public abstract class AbstractConfigHelper  {
             Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>(
                     Arrays.asList(configInterfaces));
             interfaces.add(Map.class);
-            Assert.isTrue(interfaces.remove(GroovyObject.class));
+            Assert.notNull(interfaces.remove(GroovyObject.class));
 
             @SuppressWarnings("unchecked")
             Map<Object, Object> result = (Map<Object, Object>) java.lang.reflect.Proxy
