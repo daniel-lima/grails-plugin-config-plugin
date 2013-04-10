@@ -38,6 +38,11 @@ class PluginConfigGrailsPlugin {
         "file:./grails-app/config/**/*DefaultConfig.groovy"
     ]
 
+    def license = 'APACHE'
+    def developers = [[name: 'Joanna Dabal', email: 'joanna@9ci.com']]
+    def issueManagement = [system: 'GitHub', url: 'https://github.com/jdabal/grails-plugin-config-plugin/issues']
+    def scm = [url: 'https://github.com/jdabal/grails-plugin-config-plugin']
+
     private DefaultConfigHelper configHelper = new DefaultConfigHelper()
 
     def doWithWebDescriptor = { xml ->
