@@ -45,9 +45,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 
 /**
- * 
  * @author Daniel Henrique Alves Lima
- * 
  */
 public abstract class AbstractConfigHelper  {
 
@@ -57,7 +55,6 @@ public abstract class AbstractConfigHelper  {
     protected final Log log = LogFactory.getLog(getClass());
     private GrailsPluginManager defaultPluginManager;
 
-   
     public void setDefaultPluginManager(GrailsPluginManager defaultPluginManager) {
         if (log.isDebugEnabled()) {
             log.debug("setPluginManager(): " + defaultPluginManager);
@@ -77,8 +74,8 @@ public abstract class AbstractConfigHelper  {
 
         Assert.notNull(pluginManager);
         Assert.notNull(grailsApplication);
-        
-        Metadata applicationMetaData = (Metadata) grailsApplication.getMetadata();
+
+        Metadata applicationMetaData = grailsApplication.getMetadata();
         String applicationName = applicationMetaData.getApplicationName();
 
         List<Class<?>> defaultConfigClasses = new ArrayList<Class<?>>();
@@ -105,8 +102,7 @@ public abstract class AbstractConfigHelper  {
 
                 String configName = pluginClass.getSimpleName();
                 if (configName.endsWith(GRAILS_PLUGIN_SUFFIX)) {
-                    configName = configName.replace(GRAILS_PLUGIN_SUFFIX,
-                            DEFAULT_CONFIG_SUFFIX);
+                    configName = configName.replace(GRAILS_PLUGIN_SUFFIX, DEFAULT_CONFIG_SUFFIX);
                 } else {
                     configName = configName + DEFAULT_CONFIG_SUFFIX;
                 }
@@ -115,16 +111,13 @@ public abstract class AbstractConfigHelper  {
                 }
 
                 if (classesLoaded) {
-                    defaultConfigClass = grailsApplication
-                            .getClassForName(configName);
+                    defaultConfigClass = grailsApplication.getClassForName(configName);
                 } else {
                     /*
-                     * When called from doWithWebDescriptor, classes aren't
-                     * loaded yet.
+                     * When called from doWithWebDescriptor, classes aren't loaded yet.
                      */
                     try {
-                        defaultConfigClass = grailsApplication.getClassLoader()
-                                .loadClass(configName);
+                        defaultConfigClass = grailsApplication.getClassLoader().loadClass(configName);
                         // defaultConfigClass = null;
                     } catch (ClassNotFoundException e) {
                     }
@@ -132,39 +125,32 @@ public abstract class AbstractConfigHelper  {
 
                 if (defaultConfigClass != null) {
                     /* The class is inside one grails-app subdirectory. */
-                    pluginClassMetadata = pluginClass
-                            .getAnnotation(org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin.class);
+                    pluginClassMetadata = pluginClass.getAnnotation(
+                            org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin.class);
 
-                    defaultConfigClassMetadata = defaultConfigClass
-                            .getAnnotation(org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin.class);
+                    defaultConfigClassMetadata = defaultConfigClass.getAnnotation(
+                            org.codehaus.groovy.grails.plugins.metadata.GrailsPlugin.class);
 
                     if (log.isDebugEnabled()) {
-                        log.debug("getMergedConfigImpl(): pluginClassMetadata "
-                                + pluginClassMetadata);
-                        log.debug("getMergedConfigImpl(): defaultConfigClassMetadata "
-                                + defaultConfigClassMetadata);
+                        log.debug("getMergedConfigImpl(): pluginClassMetadata " + pluginClassMetadata);
+                        log.debug("getMergedConfigImpl(): defaultConfigClassMetadata " + defaultConfigClassMetadata);
                     }
 
-                    if (pluginClassMetadata == null
-                            && defaultConfigClassMetadata == null
-                            || pluginClassMetadata != null
-                            && defaultConfigClassMetadata != null
-                            && pluginClassMetadata.name().equals(
-                                    defaultConfigClassMetadata.name())
-                            || /* Workaround when building this as a Grails 2.0.0 plugin. */ 
-                            applicationName != null
-                            && applicationName.equals(plugin.getFileSystemShortName())) {
+                    if (pluginClassMetadata == null &&
+                            defaultConfigClassMetadata == null ||
+                            pluginClassMetadata != null &&
+                            defaultConfigClassMetadata != null &&
+                            pluginClassMetadata.name().equals(defaultConfigClassMetadata.name()) ||
+                            /* Workaround when building this as a Grails 2.0.0 plugin. */ applicationName != null &&
+                            applicationName.equals(plugin.getFileSystemShortName())) {
                         /* The default config belongs to this plugin. */
                         log.debug("getMergedConfigImpl(): default config found");
                     } else {
                         if (log.isWarnEnabled()) {
-                            log.warn("getMergedConfigImpl(): "
-                                    + defaultConfigClass
-                                    + " doesn't belong to " + plugin.getName());
+                            log.warn("getMergedConfigImpl(): " + defaultConfigClass + " doesn't belong to " + plugin.getName());
                         }
                         defaultConfigClass = null;
                     }
-
                 }
 
                 if (defaultConfigClass != null) {
@@ -172,9 +158,7 @@ public abstract class AbstractConfigHelper  {
                 }
 
                 GroovyObject pluginInstance = plugin.getInstance();
-                Object o = GrailsClassUtils
-                        .getPropertyOrStaticPropertyOrFieldValue(
-                                pluginInstance, "afterConfigMerge");
+                Object o = GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(pluginInstance, "afterConfigMerge");
                 if (o != null) {
                     Closure c = null;
                     if (o instanceof Closure) {
@@ -189,8 +173,7 @@ public abstract class AbstractConfigHelper  {
 
                     if (c == null) {
                         if (log.isWarnEnabled()) {
-                            log.warn("getMergedConfigImpl(): Invalid afterConfigMerge closure "
-                                    + o);
+                            log.warn("getMergedConfigImpl(): Invalid afterConfigMerge closure " + o);
                         }
                     }
                 }
@@ -198,27 +181,23 @@ public abstract class AbstractConfigHelper  {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("getMergedConfigImpl(): defaultConfigClasses "
-                    + defaultConfigClasses);
+            log.debug("getMergedConfigImpl(): defaultConfigClasses " + defaultConfigClasses);
         }
 
         GroovyClassLoader classLoader = null;
 
-        {
-            ClassLoader parentClassLoader = grailsApplication.getClassLoader();
+        ClassLoader parentClassLoader = grailsApplication.getClassLoader();
+        if (parentClassLoader == null) {
+            parentClassLoader = Thread.currentThread().getContextClassLoader();
             if (parentClassLoader == null) {
-                parentClassLoader = Thread.currentThread()
-                        .getContextClassLoader();
-                if (parentClassLoader == null) {
-                    parentClassLoader = this.getClass().getClassLoader();
-                }
+                parentClassLoader = getClass().getClassLoader();
             }
+        }
 
-            if (parentClassLoader instanceof GroovyClassLoader) {
-                classLoader = (GroovyClassLoader) parentClassLoader;
-            } else {
-                classLoader = new GroovyClassLoader(parentClassLoader);
-            }
+        if (parentClassLoader instanceof GroovyClassLoader) {
+            classLoader = (GroovyClassLoader) parentClassLoader;
+        } else {
+            classLoader = new GroovyClassLoader(parentClassLoader);
         }
 
         ConfigObject config = new ConfigObject();
@@ -234,26 +213,22 @@ public abstract class AbstractConfigHelper  {
          * Executed the collected closures. It's the last chance of influencing
          * the merged config.
          */
-        {
-            Map<String, Object> ctx = new LinkedHashMap<String, Object>();
-            ctx.put("appConfig", grailsApplication.getConfig());
-            ctx = Collections.unmodifiableMap(ctx);
+        Map<String, Object> ctx = new LinkedHashMap<String, Object>();
+        ctx.put("appConfig", grailsApplication.getConfig());
+        ctx = Collections.unmodifiableMap(ctx);
 
-            Object arg = config;
-            Object [] args = new Object[] { config, ctx };
+        Object arg = config;
+        Object [] args = new Object[] { config, ctx };
 
-            for (Closure closure : afterConfigMergeClosures) {
-                try {
-                    if (closure.getMaximumNumberOfParameters() == 1) {
-                        closure.call(arg);
-                    } else {
-                        closure.call(args);
-                    }
-                } catch (RuntimeException e) {
-                    log.error(
-                            "getMergedConfigImpl(): error executing afterConfigClosure",
-                            e);
+        for (Closure closure : afterConfigMergeClosures) {
+            try {
+                if (closure.getMaximumNumberOfParameters() == 1) {
+                    closure.call(arg);
+                } else {
+                    closure.call(args);
                 }
+            } catch (RuntimeException e) {
+                log.error("getMergedConfigImpl(): error executing afterConfigClosure", e);
             }
         }
 
@@ -313,7 +288,7 @@ public abstract class AbstractConfigHelper  {
         }
 
         if (pluginManager == null) {
-            pluginManager = this.defaultPluginManager;
+            pluginManager = defaultPluginManager;
         }
 
         Assert.notNull(pluginManager);
@@ -356,24 +331,21 @@ public abstract class AbstractConfigHelper  {
         }
 
         @SuppressWarnings({ "unchecked" })
-        public Object invoke(Object proxy, Method m, Object[] args)
-                throws Throwable {
+        public Object invoke(Object proxy, Method m, Object[] args) throws Throwable {
             Object result = null;
             try {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("before method " + m.getName());
                 }
 
-                if (m.getDeclaringClass().equals(Map.class)
-                        && m.getName().equals("get")) {
+                if (m.getDeclaringClass().equals(Map.class) && m.getName().equals("get")) {
                     boolean containsKey = config.containsKey(args[0]);
 
                     if (!containsKey) {
                         result = null;
 
                         if (isCheckedMap) {
-                            throw new IllegalArgumentException(
-                                    "Inexistent key " + args[0]);
+                            throw new IllegalArgumentException("Inexistent key " + args[0]);
                         }
                     }
                 }
@@ -383,8 +355,7 @@ public abstract class AbstractConfigHelper  {
                 }
 
                 if (result != null && result instanceof ConfigObject) {
-                    result = newInstance((Map<Object, Object>) result,
-                            isCheckedMap);
+                    result = newInstance((Map<Object, Object>) result, isCheckedMap);
                 }
                 /*
                  * } catch (Exception e) { throw new
@@ -399,5 +370,4 @@ public abstract class AbstractConfigHelper  {
             return result;
         }
     }
-
 }

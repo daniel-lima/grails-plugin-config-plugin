@@ -3,3 +3,8 @@
 .classpath_sts
 .project_groovy
 .project_sts
+*.zip
+plugin.xml
+.settings
+web-app
+*.log
