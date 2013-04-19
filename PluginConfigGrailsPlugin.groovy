@@ -16,8 +16,8 @@
 import org.grails.plugin.config.DefaultConfigHelper
 
 class PluginConfigGrailsPlugin {
-    def version = '0.1.5'
-    def grailsVersion = '1.3 > *'
+    def version = '0.1.7'
+    def grailsVersion = '2.0.0 > *'
     def loadBefore = ['logging']
     def loadAfter = ['core']
 
