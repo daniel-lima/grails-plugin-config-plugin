@@ -235,16 +235,14 @@ public abstract class AbstractConfigHelper {
         return config;
     }
 
-    protected void mergeInDefaultConfigs(ConfigObject config,
-                                         List<Class<?>> defaultConfigClasses, GroovyClassLoader classLoader) {
+    protected void mergeInDefaultConfigs(ConfigObject config, List<Class<?>> defaultConfigClasses, GroovyClassLoader classLoader) {
         ConfigSlurper configSlurper = new ConfigSlurper(Environment
                 .getCurrent().getName());
         configSlurper.setClassLoader(classLoader);
         for (Class<?> defaultConfigClass : defaultConfigClasses) {
             try {
                 configSlurper.setBinding(config);
-                ConfigObject newConfig = configSlurper
-                        .parse(defaultConfigClass);
+                ConfigObject newConfig = configSlurper.parse(defaultConfigClass);
                 if (log.isDebugEnabled()) {
                     log.debug("mergeInDefaultConfigs(): newConfig " + newConfig);
                 }
