@@ -28,10 +28,10 @@ class PluginConfigGrailsPlugin {
     def loadAfter = ['core']
 
     def pluginExcludes = [
-        "grails-app/views/error.gsp",
-        'scripts/**/Eclipse.groovy',
-        'grails-app/conf/**/FiltersDefaultConfig.groovy',
-        'test-plugins/**/*'
+            "grails-app/views/error.gsp",
+            'scripts/**/Eclipse.groovy',
+            'grails-app/conf/**/FiltersDefaultConfig.groovy',
+            'test-plugins/**/*'
     ]
 
     def author = "Daniel Henrique Alves Lima"
@@ -41,7 +41,7 @@ class PluginConfigGrailsPlugin {
     def documentation = "http://grails.org/plugin/plugin-config"
 
     def watchedResources = [
-        "file:./grails-app/config/**/*DefaultConfig.groovy"
+            "file:./grails-app/config/**/*DefaultConfig.groovy"
     ]
 
     def license = 'APACHE'

@@ -38,7 +38,7 @@ class DefaultConfigHelper extends AbstractConfigHelper {
 
         //MetaClass mc = GrailsApplication.metaClass
         //if (mc.respondsTo(GrailsApplication, '_notifyConfigChange')) {
-            GrailsApplication._notifyConfigChange()
+        GrailsApplication._notifyConfigChange()
         //}
     }
 
@@ -56,7 +56,7 @@ class DefaultConfigHelper extends AbstractConfigHelper {
             mc._mergedConfig = null
             mc.'static'._appsWitCachedConfig = appsWitCachedConfig
 
-            mc.getMergedConfig = {boolean reload = false ->
+            mc.getMergedConfig = { boolean reload = false ->
 
                 if (log.isDebugEnabled()) {
                     log.debug("delegate ${delegate}")
@@ -64,7 +64,7 @@ class DefaultConfigHelper extends AbstractConfigHelper {
                 GrailsApplication app = (GrailsApplication) delegate
                 GrailsPluginManager pluginManager = super.getPluginManager(app)
                 if (log.isDebugEnabled()) {
-                    log.debug("delegate._mergedConfig ${delegate._mergedConfig?'[...]': 'null'}")
+                    log.debug("delegate._mergedConfig ${delegate._mergedConfig ? '[...]' : 'null'}")
                 }
                 if (delegate._mergedConfig == null || reload) {
                     delegate._mergedConfig = super.buildMergedConfig(pluginManager, app)
@@ -100,7 +100,7 @@ class DefaultConfigHelper extends AbstractConfigHelper {
 
         MetaClass mc = ConfigObject.metaClass
         if (!mc.respondsTo(ConfigObject, 'asMap')) {
-            mc.asMap = {boolean checked = false ->
+            mc.asMap = { boolean checked = false ->
                 ConfigObject delegate = (ConfigObject) delegate
                 return AbstractConfigHelper.ConfigObjectProxy.newInstance(delegate, checked)
             }
