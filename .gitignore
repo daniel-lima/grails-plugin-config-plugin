@@ -3,3 +3,5 @@
 .classpath_sts
 .project_groovy
 .project_sts
+.idea
+*.iml
