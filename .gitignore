@@ -5,3 +5,8 @@
 .project_sts
 .idea
 *.iml
+*.zip
+plugin.xml
+.settings
+web-app
+*.log

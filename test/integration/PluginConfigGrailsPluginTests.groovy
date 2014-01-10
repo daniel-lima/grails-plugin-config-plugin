@@ -1,23 +1,18 @@
-import org.codehaus.groovy.grails.commons.ConfigurationHolder;
-import org.codehaus.groovy.grails.commons.GrailsClassUtils;
-import org.codehaus.groovy.grails.plugins.GrailsPlugin;
-
-import grails.test.*
-
-
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import org.codehaus.groovy.grails.plugins.GrailsPlugin
 
 class PluginConfigGrailsPluginTests extends GroovyTestCase {
 
     def pluginManager
     def grailsApplication
-    
-    public void testOnChange() {
+
+    void testOnChange() {
         ConfigObject mergedConfig = grailsApplication.mergedConfig
         assertNotNull mergedConfig
         assertSame mergedConfig, grailsApplication.mergedConfig
         assertSame mergedConfig, grailsApplication.mergedConfig
         assertEquals mergedConfig, grailsApplication.mergedConfig
-        
+
         GrailsPlugin plugin = pluginManager.getGrailsPluginForClassName('PluginConfigGrailsPlugin')
         def pluginInstance = plugin.instance
         //def pluginInstance = new PluginConfigGrailsPlugin()
@@ -26,9 +21,8 @@ class PluginConfigGrailsPluginTests extends GroovyTestCase {
         Map event = [ctx: grailsApplication.mainContext, application: grailsApplication]
         onChange(event)
         assertNotSame mergedConfig, grailsApplication.mergedConfig
-        
+
         Closure onConfigChange = GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue (pluginInstance, 'onConfigChange')
         onConfigChange(event)
     }
-    
 }
