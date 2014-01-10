@@ -30,7 +30,7 @@ class PluginConfigGrailsPlugin {
     def pluginExcludes = [
             "grails-app/views/error.gsp",
             'scripts/**/Eclipse.groovy',
-            'grails-app/conf/**/FiltersDefaultConfig.groovy',
+            'grails-app/conf/**/CustomDefaultConfig.groovy',
             'test-plugins/**/*'
     ]
 
