@@ -9,6 +9,7 @@ log4j = {
 grails.plugins.third.valueToOverride = 'app has a different value'
 grails.plugins.first.valueToOverride = null
 
+grails.config.locations = [MyConfig]
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements
 
 /* remove this line 

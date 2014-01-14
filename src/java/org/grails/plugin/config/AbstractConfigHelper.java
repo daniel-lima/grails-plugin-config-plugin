@@ -92,7 +92,8 @@ public abstract class AbstractConfigHelper {
                 classesLoaded = true;
             }
         }
-        for (GrailsPlugin plugin : pluginManager.getAllPlugins()) {
+        GrailsPlugin[] allPlugins = pluginManager.getAllPlugins();
+        for (GrailsPlugin plugin : allPlugins) {
             if (plugin.isEnabled()) {
                 Class<?> defaultConfigClass = null;
 
