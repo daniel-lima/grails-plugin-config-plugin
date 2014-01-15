@@ -20,16 +20,14 @@ class DefaultConfigHelperTests extends GroovyTestCase {
         ConfigObject config = grailsApplication.config
         ConfigObject mergedConfig = grailsApplication.mergedConfig // Avoid to change the grailsApplication.mergedConfig
 
-        /* heyHo won't work for Grails 2.0.0 because FilterDefaultConfig.groovy
-         * will belong to config plugin instead of to filters plugin. */
         assertEquals 123, mergedConfig.grails.plugins.heyHo.logVal1
         assertEquals 'abc', mergedConfig.grails.plugins.heyHo.logVal2
 
         assertTrue 123 == mergedConfig.grails.plugins.heyHo.logVal1
-        assertFalse 123 == config.grails.plugins.heyHo.logVal1
+        assertTrue 123 == config.grails.plugins.heyHo.logVal1
 
         assertTrue 'abc' == mergedConfig.grails.plugins.heyHo.logVal2
-        assertFalse 'abc' == config.grails.plugins.heyHo.logVal2
+        assertTrue 'abc' == config.grails.plugins.heyHo.logVal2
 
         assertEquals true, mergedConfig.grails.plugins.config.autoDefault
         assertEquals 'configValue', mergedConfig.grails.plugins.config.sampleValue2

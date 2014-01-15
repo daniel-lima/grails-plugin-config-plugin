@@ -1,16 +1,22 @@
 grails.project.work.dir = 'target'
 
 grails.project.dependency.resolution = {
-
     inherits 'global'
     log 'warn'
-
     repositories {
-        grailsCentral()
+        grailsPlugins()
+        grailsHome()
+        if ("$grailsVersion" > "1.2.5") {
+            grailsCentral()
+        }
     }
-
+    dependencies {
+    }
     plugins {
-        build ':release:2.2.1', ':rest-client-builder:1.0.3', {
+        build ':tomcat:7.0.47', ':release:3.0.1', ':rest-client-builder:1.0.3', {
+            export = false
+        }
+        runtime ':hibernate:3.6.10.6', {
             export = false
         }
     }

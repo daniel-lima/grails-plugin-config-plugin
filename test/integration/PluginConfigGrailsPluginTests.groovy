@@ -17,12 +17,12 @@ class PluginConfigGrailsPluginTests extends GroovyTestCase {
         def pluginInstance = plugin.instance
         //def pluginInstance = new PluginConfigGrailsPlugin()
         pluginInstance.metaClass.application = grailsApplication
-        Closure onChange = GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue (pluginInstance, 'onChange')
+        Closure onChange = GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(pluginInstance, 'onChange')
         Map event = [ctx: grailsApplication.mainContext, application: grailsApplication]
         onChange(event)
         assertNotSame mergedConfig, grailsApplication.mergedConfig
 
-        Closure onConfigChange = GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue (pluginInstance, 'onConfigChange')
+        Closure onConfigChange = GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(pluginInstance, 'onConfigChange')
         onConfigChange(event)
     }
 }

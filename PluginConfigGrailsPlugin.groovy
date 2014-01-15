@@ -16,16 +16,22 @@
 import org.grails.plugin.config.DefaultConfigHelper
 
 class PluginConfigGrailsPlugin {
-    def version = '0.1.8'
-    def grailsVersion = '1.3 > *'
+
+    // the plugin version
+    def version = '0.2.0'
+    // the version or versions of Grails the plugin is designed for
+    def grailsVersion = '2.0 > *'
+    // the other plugins this plugin depends on
+    def dependsOn = ['core': '* > 1.0']
+
     def loadBefore = ['logging']
     def loadAfter = ['core']
 
     def pluginExcludes = [
-        "grails-app/views/error.gsp",
-        'scripts/**/Eclipse.groovy',
-        'grails-app/conf/**/FiltersDefaultConfig.groovy',
-        'test-plugins/**/*'
+            "grails-app/views/error.gsp",
+            'scripts/**/Eclipse.groovy',
+            'grails-app/conf/**/MyConfig.groovy',
+            'test-plugins/**/*'
     ]
 
     def author = "Daniel Henrique Alves Lima"
@@ -35,7 +41,7 @@ class PluginConfigGrailsPlugin {
     def documentation = "http://grails.org/plugin/plugin-config"
 
     def watchedResources = [
-        "file:./grails-app/config/**/*DefaultConfig.groovy"
+            "file:./grails-app/config/**/*DefaultConfig.groovy"
     ]
 
     def license = 'APACHE'

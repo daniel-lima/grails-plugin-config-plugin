@@ -47,7 +47,7 @@ import org.springframework.util.Assert;
 /**
  * @author Daniel Henrique Alves Lima
  */
-public abstract class AbstractConfigHelper  {
+public abstract class AbstractConfigHelper {
 
     private static final String GRAILS_PLUGIN_SUFFIX = "GrailsPlugin";
     private static final String DEFAULT_CONFIG_SUFFIX = "DefaultConfig";
@@ -67,7 +67,7 @@ public abstract class AbstractConfigHelper  {
     public abstract void notifyConfigChange();
 
     protected ConfigObject buildMergedConfig(GrailsPluginManager pluginManager,
-            GrailsApplication grailsApplication) {
+                                             GrailsApplication grailsApplication) {
         if (log.isDebugEnabled()) {
             log.debug("getMergedConfigImpl()");
         }
@@ -92,7 +92,8 @@ public abstract class AbstractConfigHelper  {
                 classesLoaded = true;
             }
         }
-        for (GrailsPlugin plugin : pluginManager.getAllPlugins()) {
+        GrailsPlugin[] allPlugins = pluginManager.getAllPlugins();
+        for (GrailsPlugin plugin : allPlugins) {
             if (plugin.isEnabled()) {
                 Class<?> defaultConfigClass = null;
 
@@ -139,8 +140,8 @@ public abstract class AbstractConfigHelper  {
                     if (pluginClassMetadata == null &&
                             defaultConfigClassMetadata == null ||
                             pluginClassMetadata != null &&
-                            defaultConfigClassMetadata != null &&
-                            pluginClassMetadata.name().equals(defaultConfigClassMetadata.name()) ||
+                                    defaultConfigClassMetadata != null &&
+                                    pluginClassMetadata.name().equals(defaultConfigClassMetadata.name()) ||
                             /* Workaround when building this as a Grails 2.0.0 plugin. */ applicationName != null &&
                             applicationName.equals(plugin.getFileSystemShortName())) {
                         /* The default config belongs to this plugin. */
@@ -218,7 +219,7 @@ public abstract class AbstractConfigHelper  {
         ctx = Collections.unmodifiableMap(ctx);
 
         Object arg = config;
-        Object [] args = new Object[] { config, ctx };
+        Object[] args = new Object[]{config, ctx};
 
         for (Closure closure : afterConfigMergeClosures) {
             try {
@@ -235,16 +236,14 @@ public abstract class AbstractConfigHelper  {
         return config;
     }
 
-    protected void mergeInDefaultConfigs(ConfigObject config,
-            List<Class<?>> defaultConfigClasses, GroovyClassLoader classLoader) {
+    protected void mergeInDefaultConfigs(ConfigObject config, List<Class<?>> defaultConfigClasses, GroovyClassLoader classLoader) {
         ConfigSlurper configSlurper = new ConfigSlurper(Environment
                 .getCurrent().getName());
         configSlurper.setClassLoader(classLoader);
         for (Class<?> defaultConfigClass : defaultConfigClasses) {
             try {
                 configSlurper.setBinding(config);
-                ConfigObject newConfig = configSlurper
-                        .parse(defaultConfigClass);
+                ConfigObject newConfig = configSlurper.parse(defaultConfigClass);
                 if (log.isDebugEnabled()) {
                     log.debug("mergeInDefaultConfigs(): newConfig " + newConfig);
                 }
@@ -279,7 +278,7 @@ public abstract class AbstractConfigHelper  {
             if (mainContext != null) {
                 try {
                     pluginManager = (GrailsPluginManager) mainContext
-                        .getBean("pluginManager");
+                            .getBean("pluginManager");
                 } catch (org.springframework.beans.factory.NoSuchBeanDefinitionException e) {
                     /* Workaround for Grails 2.0.0. */
                     log.warn("getPluginManager()", e);
@@ -305,7 +304,7 @@ public abstract class AbstractConfigHelper  {
         private Map<Object, Object> config;
 
         public static Object newInstance(Map<Object, Object> config,
-                boolean isCheckedMap) {
+                                         boolean isCheckedMap) {
             ClassLoader cl = config.getClass().getClassLoader();
 
             Class<?>[] configInterfaces = config.getClass().getInterfaces();
@@ -325,12 +324,12 @@ public abstract class AbstractConfigHelper  {
         }
 
         private ConfigObjectProxy(Map<Object, Object> config,
-                boolean isCheckedMap) {
+                                  boolean isCheckedMap) {
             this.config = config;
             this.isCheckedMap = isCheckedMap;
         }
 
-        @SuppressWarnings({ "unchecked" })
+        @SuppressWarnings({"unchecked"})
         public Object invoke(Object proxy, Method m, Object[] args) throws Throwable {
             Object result = null;
             try {
